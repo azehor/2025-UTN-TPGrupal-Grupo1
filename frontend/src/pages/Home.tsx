@@ -5,7 +5,7 @@ const Home: FC = () => {
 
   return (
     <section>
-      <h2>Home</h2>
+      <h1>Bienvenidos a QuePC</h1>
       <p>Contador: {count}</p>
       <button onClick={() => setCount(c => c + 1)}>Sumar</button>
     </section>
