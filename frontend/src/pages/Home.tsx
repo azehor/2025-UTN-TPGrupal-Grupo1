@@ -6,6 +6,7 @@ const Home: FC = () => {
   return (
     <div className="container">
       <h1 className="titulo">QuePC</h1>
+      <h2 className="subtitulo">Seleccione debajo la forma por la cual buscará su PC</h2>
 
       <div className="modulos">
         <Boton>Buscar por Software</Boton>
