@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import Boton from "../components/boton";
+import Boton from "../components/Boton";
 import "../App.css"; //para los estilos globales
 
 const Home: FC = () => {
