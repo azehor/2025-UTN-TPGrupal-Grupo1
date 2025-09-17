@@ -9,15 +9,21 @@ import (
 	"syscall"
 
 	//internal project imports
+	"quepc/api/internal/carreras"
+	cStore "quepc/api/internal/carreras/store"
 	transport "quepc/api/internal/transport/http"
 
 	//external library imports
 	"github.com/go-chi/chi/v5"
 )
 
-func Start() {
+func Start(port string) {
 	r := chi.NewRouter()
-	httpServer := transport.New()
+
+	carrerasStore := cStore.New()
+	carreras := carreras.New(carrerasStore)
+
+	httpServer := transport.New(carreras)
 	httpServer.AddRoutes(r)
 
 	c := make(chan os.Signal, 1)
@@ -28,7 +34,8 @@ func Start() {
 		os.Exit(1)
 	}()
 
-	http.ListenAndServe(":8080", r)
+	fmt.Printf("Running server on port: %v", port)
+	http.ListenAndServe(port, r)
 	shutdown()
 }
 
