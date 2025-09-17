@@ -1,0 +1,30 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  justify-content: center; 
+  min-height: 100vh;
+  background-color: #b0c4b1;
+  text-align: center;
+}
+
+.titulo {
+  font-size: 3rem;
+  color: #1e40af;
+  margin-bottom: 40px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.subtitulo {
+  font-size: 20px;       /* Tamaño de la letra */
+  color: #555555;        /* Color gris oscuro */
+  font-weight: 400;      /* Normal, no tan grueso como un título */
+  margin-top: 10px;      /* Separación del título */
+  font-family: Arial, sans-serif; /* Tipo de letra */
+  text-align: center;    /* Centrar el texto */
+}
+
+.modulos {
+  display: flex;
+  gap: 20px;
+}

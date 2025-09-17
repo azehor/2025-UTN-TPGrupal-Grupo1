@@ -1,14 +1,18 @@
-import { useState, type FC } from "react";
+import type { FC } from "react";
+import Boton from "../components/boton";
+import "../App.css"; //para los estilos globales
 
 const Home: FC = () => {
-    const [count, setCount] = useState(0)
-
   return (
-    <section>
-      <h2>Home</h2>
-      <p>Contador: {count}</p>
-      <button onClick={() => setCount(c => c + 1)}>Sumar</button>
-    </section>
+    <div className="container">
+      <h1 className="titulo">QuePC</h1>
+      <h2 className="subtitulo">Seleccione debajo la forma por la cual buscará su PC</h2>
+
+      <div className="modulos">
+        <Boton>Buscar por Software</Boton>
+        <Boton>Buscar por Carrera</Boton>
+      </div>
+    </div>
   )
 }
 

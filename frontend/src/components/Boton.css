@@ -1,0 +1,14 @@
+.botonAzul {
+  background-color: #1e40af; /* azul */
+  color: white; /* letras blancas */
+  padding: 10px 20px; /* espacio interno */
+  font-size: 16px;
+  border: none;
+  border-radius: 5px; /* esquinas redondeadas */
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.botonAzul:hover {
+  background-color: #1d4ed8; /* azul más claro cuando pasas el mouse */
+}
