@@ -11,6 +11,10 @@ import (
 	//internal project imports
 	"quepc/api/internal/carreras"
 	cStore "quepc/api/internal/carreras/store"
+
+	"quepc/api/internal/softwares"
+	sStore "quepc/api/internal/softwares/store"
+
 	transport "quepc/api/internal/transport/http"
 
 	//external library imports
@@ -23,7 +27,10 @@ func Start(port string) {
 	carrerasStore := cStore.New()
 	carreras := carreras.New(carrerasStore)
 
-	httpServer := transport.New(carreras)
+	softwaresStore := sStore.New()
+	softwares := softwares.New(softwaresStore)
+
+	httpServer := transport.New(carreras, softwares)
 	httpServer.AddRoutes(r)
 
 	c := make(chan os.Signal, 1)
