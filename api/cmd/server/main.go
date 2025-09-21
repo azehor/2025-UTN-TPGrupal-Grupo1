@@ -19,10 +19,20 @@ import (
 
 	//external library imports
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 )
 
 func Start(port string) {
 	r := chi.NewRouter()
+
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:5173"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
 
 	carrerasStore := cStore.New()
 	carreras := carreras.New(carrerasStore)
