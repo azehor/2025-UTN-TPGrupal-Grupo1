@@ -1,29 +1,39 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const softwareList: string[] = [
-  "AutoCAD",
-  "Photoshop",
-  "Illustrator",
-  "Premiere Pro",
-  "After Effects",
-  "Visual Studio",
-  "IntelliJ IDEA",
-  "Eclipse",
-  "NetBeans",
-  "Unity",
-  "Unreal Engine",
-  "Blender",
-  "Maya",
-  "3ds Max"
-];
+interface Software {
+  id: string;
+  nombre: string;
+  empresa: string;
+  imageURL: string;
+}
 
 export const SoftwareSearch: React.FC = () => {
   const [query, setQuery] = useState("");
+  const [softwareList, setSoftwareList] = useState<Software[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const filteredList = softwareList.filter(soft =>
-    soft.toLowerCase().includes(query.toLowerCase())
+    soft.nombre.toLowerCase().includes(query.toLowerCase())
   );
 
+  useEffect(() => {
+    const obtenerListadoSoftwaresApi = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/v1/softwares"); // Endpoint de api en go local, ver luego en .env de manejar estas urls 
+        if (!res.ok) {
+          throw new Error(`Error HTTP: ${res.status}`);
+        }
+        const data: Software[] = await res.json();
+        setSoftwareList(data);
+      } catch (err: any) {
+        setError(err.message || "Error al obtener listado de software");
+        console.error(error);
+      } 
+    };
+
+    obtenerListadoSoftwaresApi();
+  }, []);
+  
   return (
     <div style={{ fontFamily: "sans-serif", padding: "1rem", maxWidth: "400px" }}>
       <h2>Software Search</h2>
@@ -44,7 +54,7 @@ export const SoftwareSearch: React.FC = () => {
 
       <ul>
         {filteredList.length > 0 ? (
-          filteredList.map((soft, index) => <li key={index}>{soft}</li>)
+          filteredList.map((soft, index) => <li key={index}>{soft.nombre}</li>)
         ) : (
           <li>No software found</li>
         )}
