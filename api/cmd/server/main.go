@@ -11,19 +11,36 @@ import (
 	//internal project imports
 	"quepc/api/internal/carreras"
 	cStore "quepc/api/internal/carreras/store"
+
+	"quepc/api/internal/softwares"
+	sStore "quepc/api/internal/softwares/store"
+
 	transport "quepc/api/internal/transport/http"
 
 	//external library imports
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 )
 
 func Start(port string) {
 	r := chi.NewRouter()
 
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:5173"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+
 	carrerasStore := cStore.New()
 	carreras := carreras.New(carrerasStore)
 
-	httpServer := transport.New(carreras)
+	softwaresStore := sStore.New()
+	softwares := softwares.New(softwaresStore)
+
+	httpServer := transport.New(carreras, softwares)
 	httpServer.AddRoutes(r)
 
 	c := make(chan os.Signal, 1)
