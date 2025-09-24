@@ -1,34 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const listaCarrera: string[] = [
-  "Arquitectura",
-  "Diseño Gráfico",
-  "Fotografía",
-  "ingeniería de Software",
-  "Arquitectura de Software",
-  "Desarrollo Web",
-  "profesorado de matemática",
-  "ingenieria civil",
-  "ingenieria industrial",
-  "fisica",
-  "marketing",
-  "Traducción",
-  "Humanidades",
-  "ingenieria quimica",
-  "medicina",
-  "Leyes",
-];
+interface Carrera {
+  id: string;
+  nombre: string;
+  empresa: string;
+  imageURL: string;
+}
 
 export const BusquedaCarrera: React.FC = () => {
   const [query, setQuery] = useState("");
+  const [carreraList, setCarreraList] = useState<Carrera[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredList = listaCarrera.filter(soft =>
-    soft.toLowerCase().includes(query.toLowerCase())
+  const filteredList = carreraList.filter(soft =>
+    soft.nombre.toLowerCase().includes(query.toLowerCase())
   );
 
+  useEffect(() => {
+    const obtenerListadoCarreraApi = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/v1/carreras"); // Endpoint de api en go local, ver luego en .env de manejar estas urls 
+        if (!res.ok) {
+          throw new Error(`Error HTTP: ${res.status}`);
+        }
+        const data: Carrera[] = await res.json();
+        setCarreraList(data);
+      } catch (err: any) {
+        setError(err.message || "Error al obtener listado de carreras");
+        console.error(error);
+      } 
+    };
+
+    obtenerListadoCarreraApi();
+  }, []);
+  
   return (
     <div style={{ fontFamily: "sans-serif", padding: "1rem", maxWidth: "400px" }}>
-      <h2>Busqueda por carrera</h2>
+      <h2>Busqueda Carrera</h2>
 
       <input
         type="text"
@@ -46,9 +54,9 @@ export const BusquedaCarrera: React.FC = () => {
 
       <ul>
         {filteredList.length > 0 ? (
-          filteredList.map((soft, index) => <li key={index}>{soft}</li>)
+          filteredList.map((carrera, index) => <li key={index}>{carrera.nombre}</li>)
         ) : (
-          <li>No software found</li>
+          <li>No se encontro carrera </li>
         )}
       </ul>
     </div>
