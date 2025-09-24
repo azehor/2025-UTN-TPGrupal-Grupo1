@@ -13,7 +13,9 @@ const Home: FC = () => {
         <Link to="/software-search">
           <Boton>Busqueda por Software</Boton>
         </Link>
+        <Link to="/busqueda-carrera">
         <Boton>Buscar por Carrera</Boton>
+        </Link>
       </div>
     </div>
   )
