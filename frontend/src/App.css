@@ -16,12 +16,12 @@
 }
 
 .subtitulo {
-  font-size: 20px;       /* Tamaño de la letra */
-  color: #555555;        /* Color gris oscuro */
-  font-weight: 400;      /* Normal, no tan grueso como un título */
-  margin-top: 10px;      /* Separación del título */
-  font-family: Arial, sans-serif; /* Tipo de letra */
-  text-align: center;    /* Centrar el texto */
+  font-size: 20px;  
+  color: #555555;
+  font-weight: 400;
+  margin-top: 10px;
+  font-family: Arial, sans-serif;
+  text-align: center;    
 }
 
 .modulos {
