@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 interface Carrera {
   id: string;
   nombre: string;
-  empresa: string;
   imageURL: string;
 }
 
