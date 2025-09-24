@@ -42,7 +42,6 @@ func (s *Softwares) List(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-
 	if err := json.NewEncoder(w).Encode(softwares.ToDto()); err != nil {
 		slog.Error("Error al codificar softwares a JSON", "error", err)
 		http.Error(w, `{"error":"Error interno al generar la respuesta"}`, http.StatusInternalServerError)
