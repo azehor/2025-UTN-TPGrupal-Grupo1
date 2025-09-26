@@ -7,7 +7,7 @@ interface Software {
   imageURL: string;
 }
 
-export const SoftwareSearch: React.FC = () => {
+export const BusquedaSoftware: React.FC = () => {
   const [query, setQuery] = useState("");
   const [softwareList, setSoftwareList] = useState<Software[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +36,7 @@ export const SoftwareSearch: React.FC = () => {
   
   return (
     <div style={{ fontFamily: "sans-serif", padding: "1rem", maxWidth: "400px" }}>
-      <h2>Software Search</h2>
+      <h2>Busqueda por Software</h2>
 
       <input
         type="text"
@@ -56,7 +56,7 @@ export const SoftwareSearch: React.FC = () => {
         {filteredList.length > 0 ? (
           filteredList.map((soft, index) => <li key={index}>{soft.nombre}</li>)
         ) : (
-          <li>No software found</li>
+          <li>Software no encontrado</li>
         )}
       </ul>
     </div>
