@@ -18,7 +18,7 @@ const App: FC = () => {
           marginBottom: "1rem"
         }}>
         <Link to="/">Inicio</Link>
-        <Link to="/busqueda-software">Software Search</Link>
+        <Link to="/busqueda-software">Busqueda Software</Link>
         <Link to="/busqueda-carrera">Busqueda Carrera</Link>
       </nav>
 
