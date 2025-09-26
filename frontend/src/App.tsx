@@ -2,7 +2,7 @@ import type { FC } from 'react'
 import './App.css'
 import Home from "./pages/Home"
 import { Link, Route, Routes } from 'react-router-dom'
-import { SoftwareSearchPage } from './pages/SoftwareSearchPage'
+import { BusquedaSoftwarePage } from './pages/BusquedaSoftwarePage'
 import { BusquedaCarreraPage } from './pages/BusquedaCarreraPage'
 
 
@@ -18,13 +18,13 @@ const App: FC = () => {
           marginBottom: "1rem"
         }}>
         <Link to="/">Inicio</Link>
-        <Link to="/software-search">Software Search</Link>
+        <Link to="/busqueda-software">Software Search</Link>
         <Link to="/busqueda-carrera">Busqueda Carrera</Link>
       </nav>
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/software-search" element={<SoftwareSearchPage />} /> 
+        <Route path="/busqueda-software" element={<BusquedaSoftwarePage />} /> 
         <Route path="/busqueda-carrera" element={<BusquedaCarreraPage />} />
       </Routes>
     </div>
