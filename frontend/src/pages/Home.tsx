@@ -10,7 +10,7 @@ const Home: FC = () => {
       <h2 className="subtitulo">Seleccione debajo la forma por la cual buscará su PC</h2>
 
       <div className="modulos">
-        <Link to="/software-search">
+        <Link to="/busqueda-software">
           <Boton>Busqueda por Software</Boton>
         </Link>
         <Link to="/busqueda-carrera">
