@@ -21,7 +21,7 @@ export const BusquedaCarrera: React.FC = () => {
     const obtenerListadoCarreraApi = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:8080/v1/carreras");
+        const res = await fetch("http://localhost:8080/v1/carreras"); // Endpoint de api en go local, ver luego en .env de manejar estas urls
         if (!res.ok) {
           throw new Error(`Error HTTP: ${res.status}`);
         }
@@ -40,13 +40,13 @@ export const BusquedaCarrera: React.FC = () => {
 
   const handleAccion = (carrera: Carrera) => {
     setSelectedId(carrera.id);
-    // Aquí puedes abrir un modal, navegar, llamar otra API, etc.
+    // aca se puede llegar a llamar otra api futura
     console.log("Botón clickeado:", carrera);
   };
 
   return (
     <div style={{ fontFamily: "sans-serif", padding: "1rem", maxWidth: "900px", margin: "0 auto" }}>
-      <h2>Busqueda Carrera</h2>
+      <h2>Buscar por carrera</h2>
 
       <input
         type="text"
