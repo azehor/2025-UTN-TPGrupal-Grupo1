@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"quepc/api/internal/carreras"
+	"quepc/api/internal/recomendaciones"
 	"quepc/api/internal/softwares"
 
 	"github.com/go-chi/chi/v5"
@@ -13,8 +14,9 @@ import (
 // Un Server incluye una referencia a cada modelo de los endpoints a exponer
 // Estos modelos deben ser acompañados por una declaracion de la interfaz que cumplen
 type Server struct {
-	carreras  *carreras.Carreras
-	softwares *softwares.Softwares
+	carreras        *carreras.Carreras
+	softwares       *softwares.Softwares
+	recomendaciones *recomendaciones.Recomendaciones
 }
 
 // Funcion de inicializacion del server, los argumentos seran los modelos a usar
@@ -43,6 +45,10 @@ func (s *Server) AddRoutes(r *chi.Mux) {
 		r.Get("/softwares/{id}", s.softwares.Read)
 		r.Put("/softwares/{id}", s.softwares.Update)
 		r.Delete("/softwares/{id}", s.softwares.Delete)
+
+		//Recomendaciones
+		r.Post("/recomendaciones-softwares", r.recomendaciones.ListSoftwares)
+		r.Post("/recomendaciones-carrera", r.recomendaciones.ListCarrera)
 	})
 }
 
