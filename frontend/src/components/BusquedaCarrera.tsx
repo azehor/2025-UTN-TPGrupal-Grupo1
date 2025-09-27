@@ -47,7 +47,6 @@ export const BusquedaCarrera: React.FC = () => {
   return (
     <div style={{ fontFamily: "sans-serif", padding: "1rem", maxWidth: "900px", margin: "0 auto" }}>
       <h2>Busqueda Carrera</h2>
-
       <input
         type="text"
         placeholder="Type to search..."
