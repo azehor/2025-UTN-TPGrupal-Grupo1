@@ -4,6 +4,7 @@ import Home from "./pages/Home"
 import { Link, Route, Routes, useLocation } from 'react-router-dom'
 import { BusquedaSoftwarePage } from './pages/BusquedaSoftwarePage'
 import { BusquedaCarreraPage } from './pages/BusquedaCarreraPage'
+import { RecomendacionPage } from './pages/RecomendacionPage'
 
 
 const App: FC = () => {
@@ -32,6 +33,7 @@ const App: FC = () => {
         <Route path="/" element={<Home />} />
         <Route path="/busqueda-software" element={<BusquedaSoftwarePage />} />
         <Route path="/busqueda-carrera" element={<BusquedaCarreraPage />} />
+        <Route path="/recomendacion" element={<RecomendacionPage />} />
       </Routes>
     </div>
   )
