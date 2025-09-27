@@ -11,7 +11,7 @@ const Home: FC = () => {
 
       <div className="modulos">
         <Link to="/busqueda-software">
-          <Boton>Busqueda por Software</Boton>
+          <Boton>Buscar por Software</Boton>
         </Link>
         <Link to="/busqueda-carrera">
         <Boton>Buscar por Carrera</Boton>
