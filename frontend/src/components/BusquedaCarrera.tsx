@@ -35,7 +35,7 @@ export const BusquedaCarrera: React.FC = () => {
   
   return (
     <div style={{ fontFamily: "sans-serif", padding: "1rem", maxWidth: "400px" }}>
-      <h2>Busqueda Carrera</h2>
+      <h2>Buscar por Carrera</h2>
 
       <input
         type="text"
