@@ -1,0 +1,30 @@
+.resultados-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+  text-align: center;
+}
+
+.pc-card {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.pc-card h2 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.pc-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.pc-card li {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}

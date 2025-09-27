@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
 interface Software {
   id: string;
@@ -133,6 +134,7 @@ export const BusquedaSoftware: React.FC = () => {
       </ul>
 
       {/* Botón al final */}
+      <Link to="/recomendacion">
       <button
         disabled={stack.length === 0}
         style={{
@@ -142,6 +144,7 @@ export const BusquedaSoftware: React.FC = () => {
       >
         Armar PC
       </button>
+      </Link>
     </div>
   );
 };
