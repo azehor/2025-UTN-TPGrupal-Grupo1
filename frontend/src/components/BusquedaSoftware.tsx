@@ -86,7 +86,7 @@ export const BusquedaSoftware: React.FC = () => {
 
   return (
     <div style={styles.container}>
-      <h2>Búsqueda por Software</h2>
+      <h2>Buscar por Software</h2>
 
       <div style={styles.inputWrap}>
         <input
@@ -142,7 +142,7 @@ export const BusquedaSoftware: React.FC = () => {
           ...(stack.length === 0 ? styles.actionBtnDisabled : {})
         }}
       >
-        Armar PC
+        Recomendar PC
       </button>
       </Link>
     </div>
