@@ -20,10 +20,11 @@ type Server struct {
 }
 
 // Funcion de inicializacion del server, los argumentos seran los modelos a usar
-func New(c *carreras.Carreras, s *softwares.Softwares) *Server {
+func New(c *carreras.Carreras, s *softwares.Softwares, r *recomendaciones.Recomendaciones) *Server {
 	return &Server{
-		carreras:  c,
-		softwares: s,
+		carreras:        c,
+		softwares:       s,
+		recomendaciones: r,
 	}
 }
 
@@ -47,8 +48,8 @@ func (s *Server) AddRoutes(r *chi.Mux) {
 		r.Delete("/softwares/{id}", s.softwares.Delete)
 
 		//Recomendaciones
-		r.Post("/recomendaciones-softwares", r.recomendaciones.ListSoftwares)
-		r.Post("/recomendaciones-carrera", r.recomendaciones.ListCarrera)
+		r.Post("/recomendaciones-softwares", s.recomendaciones.RecomendacionSoftware)
+		r.Get("/recomendaciones-carrera/{id}", s.recomendaciones.RecomendacionCarrera)
 	})
 }
 
