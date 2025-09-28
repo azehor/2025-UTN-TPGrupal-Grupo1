@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 interface Carrera {
   id: string;
@@ -97,7 +98,8 @@ export const BusquedaCarrera: React.FC = () => {
               )}
 
               <div style={{ flex: 1, marginBottom: "8px", fontWeight: 600 }}>{carrera.nombre}</div>
-
+              
+              <Link to="/recomendacion">
               <button
                 onClick={() => handleAccion(carrera)}
                 style={{
@@ -111,6 +113,7 @@ export const BusquedaCarrera: React.FC = () => {
               >
                 Seleccionar
               </button>
+              </Link>
             </div>
           ))
         ) : (
