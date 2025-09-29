@@ -21,7 +21,8 @@ const App: FC = () => {
             gap: "1rem",
             padding: "1rem",
             borderBottom: "1px solid #ccc",
-            marginBottom: "1rem"
+            marginBottom: "1rem",
+            justifyContent: "center"
           }}>
           <Link to="/">Inicio</Link>
           <Link to="/busqueda-software">Buscar por Software</Link>
