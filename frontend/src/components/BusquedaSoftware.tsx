@@ -151,7 +151,7 @@ export const BusquedaSoftware: React.FC = () => {
 
 // Estilos básicos
 const styles: Record<string, React.CSSProperties> = {
-  container: { width: "100%", maxWidth: 720, fontFamily: "Inter, sans-serif", padding: "1rem" },
+  container: { width: "100%", maxWidth: 720, fontFamily: "Inter, sans-serif", padding: "1rem", margin: "0 auto" },
   inputWrap: { position: "relative" },
   input: { width: "100%", padding: "10px 12px", fontSize: 14, boxSizing: "border-box" },
   suggList: {
