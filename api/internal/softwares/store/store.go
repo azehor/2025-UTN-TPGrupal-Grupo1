@@ -3,127 +3,66 @@ package store
 import (
 	"fmt"
 	"quepc/api/internal/softwares/model"
+	"regexp"
+
+	"gorm.io/gorm"
 )
 
 type Store struct {
-	//GORM db
+	db *gorm.DB
 }
 
-func New() *Store {
-	return &Store{}
+// Expresion regex para validar formato de uuid
+var uuidRegexp = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
+
+func New(db *gorm.DB) *Store {
+	return &Store{db: db}
 }
 
 func (s *Store) List() (model.Softwares, error) {
-	softwares := hardcodedData()
-	return softwares, nil
+	var list model.Softwares
+	if err := s.db.Find(&list).Error; err != nil {
+		return nil, err
+	}
+	return list, nil
 }
 
 func (s *Store) Create(software *model.Software) (*model.Software, error) {
+	if err := s.db.Create(software).Error; err != nil {
+		return nil, err
+	}
 	return software, nil
 }
 
 func (s *Store) Read(id string) (*model.Software, error) {
-	for _, sw := range hardcodedData() {
-		if sw.ID == id {
-			return sw, nil
-		}
+	var sw model.Software
+	// Validar formato UUID
+	if !uuidRegexp.MatchString(id) {
+		return nil, fmt.Errorf("id invalido")
 	}
-	return nil, fmt.Errorf("software con id %s no encontrado", id)
+	if err := s.db.First(&sw, "id = ?", id).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("software con id %s no encontrado", id)
+		}
+		return nil, err
+	}
+	return &sw, nil
 }
 
 func (s *Store) Update(software *model.Software) (int64, error) {
-	return 0, nil
+	// Validar formato UUID
+	if !uuidRegexp.MatchString(software.ID) {
+		return 0, fmt.Errorf("id invalido")
+	}
+	res := s.db.Model(&model.Software{}).Where("id = ?", software.ID).Updates(software)
+	return res.RowsAffected, res.Error
 }
 
 func (s *Store) Delete(id string) (int64, error) {
-	return 0, nil
-}
-
-func hardcodedData() []*model.Software {
-	c := make([]*model.Software, 0)
-	c = append(c, &model.Software{
-		ID:       "1",
-		Nombre:   "AutoCAD",
-		Empresa:  "Autodesk",
-		ImageURL: "",
-	})
-	c = append(c, &model.Software{
-		ID:       "2",
-		Nombre:   "Photoshop",
-		Empresa:  "Adobe",
-		ImageURL: "",
-	})
-	c = append(c, &model.Software{
-		ID:       "3",
-		Nombre:   "Illustrator",
-		Empresa:  "Adobe",
-		ImageURL: "",
-	})
-	c = append(c, &model.Software{
-		ID:       "4",
-		Nombre:   "Premiere Pro",
-		Empresa:  "Adobe",
-		ImageURL: "",
-	})
-	c = append(c, &model.Software{
-		ID:       "5",
-		Nombre:   "After Effects",
-		Empresa:  "Adobe",
-		ImageURL: "",
-	})
-	c = append(c, &model.Software{
-		ID:       "6",
-		Nombre:   "Visual Studio",
-		Empresa:  "Microsoft",
-		ImageURL: "",
-	})
-	c = append(c, &model.Software{
-		ID:       "7",
-		Nombre:   "IntelliJ IDEA",
-		Empresa:  "JetBrains",
-		ImageURL: "",
-	})
-	c = append(c, &model.Software{
-		ID:       "8",
-		Nombre:   "Eclipse",
-		Empresa:  "Eclipse Foundation",
-		ImageURL: "",
-	})
-	c = append(c, &model.Software{
-		ID:       "9",
-		Nombre:   "NetBeans",
-		Empresa:  "Apache",
-		ImageURL: "",
-	})
-	c = append(c, &model.Software{
-		ID:       "10",
-		Nombre:   "Unity",
-		Empresa:  "Unity Technologies",
-		ImageURL: "",
-	})
-	c = append(c, &model.Software{
-		ID:       "11",
-		Nombre:   "Unreal Engine",
-		Empresa:  "Epic Games",
-		ImageURL: "",
-	})
-	c = append(c, &model.Software{
-		ID:       "12",
-		Nombre:   "Blender",
-		Empresa:  "Blender Foundation",
-		ImageURL: "",
-	})
-	c = append(c, &model.Software{
-		ID:       "13",
-		Nombre:   "Maya",
-		Empresa:  "Autodesk",
-		ImageURL: "",
-	})
-	c = append(c, &model.Software{
-		ID:       "14",
-		Nombre:   "3ds Max",
-		Empresa:  "Autodesk",
-		ImageURL: "",
-	})
-	return c
+	// Validar formato UUID
+	if !uuidRegexp.MatchString(id) {
+		return 0, fmt.Errorf("id invalido")
+	}
+	res := s.db.Delete(&model.Software{}, "id = ?", id)
+	return res.RowsAffected, res.Error
 }
