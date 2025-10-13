@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :host, .busqueda-juego {
+    --color-primary: #13a4ec;
+    --color-bg-dark: #101c22;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}

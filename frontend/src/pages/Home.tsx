@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import Boton from "../components/Boton";
-import "../App.css"; //para los estilos globales
+import "./Home.css";
 import { Link } from 'react-router-dom'
 
 const Home: FC = () => {

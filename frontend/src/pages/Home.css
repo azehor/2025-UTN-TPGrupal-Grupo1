@@ -1,0 +1,35 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  justify-content: center; 
+  min-height: 100vh;
+  background-color: #b0c4b1;
+  text-align: center;
+}
+
+.titulo {
+  font-size: 3rem;
+  color: #1e40af;
+  margin-bottom: 40px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.subtitulo {
+  font-size: 20px;  
+  color: #555555;
+  font-weight: 400;
+  margin-top: 10px;
+  font-family: Arial, sans-serif;
+  text-align: center;    
+}
+
+.modulos {
+  display: flex;
+  gap: 20px;
+}
