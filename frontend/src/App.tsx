@@ -4,6 +4,7 @@ import Home from "./pages/Home"
 import { Link, Route, Routes, useLocation } from 'react-router-dom'
 import { BusquedaSoftwarePage } from './pages/BusquedaSoftwarePage'
 import { BusquedaCarreraPage } from './pages/BusquedaCarreraPage'
+import { BusquedaJuegoPage } from './pages/BusquedaJuegoPage'
 import { RecomendacionPage } from './pages/RecomendacionPage'
 
 
@@ -27,6 +28,7 @@ const App: FC = () => {
           <Link to="/">Inicio</Link>
           <Link to="/busqueda-software">Buscar por Software</Link>
           <Link to="/busqueda-carrera">Buscar por Carrera</Link>
+          <Link to="/busqueda-juego">Buscar por Juego</Link>
         </nav>
       )}
 
@@ -34,6 +36,7 @@ const App: FC = () => {
         <Route path="/" element={<Home />} />
         <Route path="/busqueda-software" element={<BusquedaSoftwarePage />} />
         <Route path="/busqueda-carrera" element={<BusquedaCarreraPage />} />
+        <Route path="/busqueda-juego" element={<BusquedaJuegoPage />} />
         <Route path="/recomendacion" element={<RecomendacionPage />} />
       </Routes>
     </div>
