@@ -1,0 +1,23 @@
+# Go
+/bin/
+/pkg/
+*.exe
+*.test
+*.out
+
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Env files
+.env
+
+# Editor configs
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db

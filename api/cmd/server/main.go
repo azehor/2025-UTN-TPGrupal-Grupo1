@@ -21,6 +21,8 @@ import (
 	//external library imports
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+
+	dbPostgresql "quepc/api/internal/db"
 )
 
 func Start(port string) {
@@ -35,10 +37,12 @@ func Start(port string) {
 		MaxAge:           300,
 	}))
 
+	dbPostgresql.InitDB()
+
 	carrerasStore := cStore.New()
 	carreras := carreras.New(carrerasStore)
 
-	softwaresStore := sStore.New()
+	softwaresStore := sStore.New(dbPostgresql.DB)
 	softwares := softwares.New(softwaresStore)
 
 	recomendaciones := recomendaciones.New()
