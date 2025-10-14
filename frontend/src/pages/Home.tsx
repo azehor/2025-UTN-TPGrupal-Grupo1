@@ -6,6 +6,9 @@ import { Link } from 'react-router-dom'
 const Home: FC = () => {
   return (
     <div className="container">
+      <Link to="/panel" className="admin-top-button">
+        <Boton>Panel</Boton>
+      </Link>
       <h1 className="titulo">QuePC</h1>
       <h2 className="subtitulo">Seleccione debajo la forma por la cual buscará su PC</h2>
 
