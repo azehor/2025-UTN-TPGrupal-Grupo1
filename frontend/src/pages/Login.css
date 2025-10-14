@@ -1,0 +1,6 @@
+.login-root { min-height: 80vh; display:flex; align-items:center; justify-content:center; }
+.login-box { background: #fff; padding: 20px; border-radius: 8px; width: 320px; box-shadow: 0 6px 20px rgba(0,0,0,0.08);} 
+.login-box h2 { margin-top:0 }
+.login-box label { display:flex; flex-direction:column; gap:6px; margin-bottom:10px }
+.login-error { color: #a00; margin-bottom:8px }
+.btn-login { background:#13a4ec; color:white; border:none; padding:8px 12px; border-radius:6px }

@@ -1,0 +1,47 @@
+/* Theme variables for warm/light vs cold/dark contrast */
+:root{
+  --warm-bg: #fff8f1; /* warm light */
+  --warm-accent: #ff8a4b; /* warm accent */
+  --warm-muted: #8b5e3c;
+
+  --cold-bg: #23160f; /* dark brown */
+  --cold-accent: #13a4ec; /* cold accent (kept blue for highlights) */
+  --cold-muted: #6d584d;
+
+  --text-dark: #2b1f18;
+  --text-light: #f6efe9;
+}
+
+/* default page uses split: content in warm panel on top, dark background overall */
+html,body,#root{height:100%;}
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  background: var(--cold-bg);
+  color: var(--text-light);
+}
+
+.app-surface{
+  background: linear-gradient(180deg, rgba(255,250,244,0.85), rgba(255,250,244,0.6));
+  color: var(--text-dark);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 24px auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.page-contrast{
+  display:block;
+  padding: 18px;
+  background: var(--warm-bg);
+  border-radius: 8px;
+}
+
+a{ color: var(--cold-accent); }
+
+.btn-primary{ background: var(--cold-accent); color: white; border: none; padding: 8px 12px; border-radius:8px }
+.btn-warm{ background: var(--warm-accent); color: white; border:none; padding:8px 12px; border-radius:8px }
+
+/* small helpers */
+.container-narrow{ max-width:1100px; margin: 0 auto; }

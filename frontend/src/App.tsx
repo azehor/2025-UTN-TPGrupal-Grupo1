@@ -1,7 +1,11 @@
 import type { FC } from 'react'
 import './App.css'
 import Home from "./pages/Home"
-import { Link, Route, Routes, useLocation } from 'react-router-dom'
+import PanelDeAdmin from './pages/PanelDeAdmin'
+import { Link, Route, Routes, useLocation, Navigate } from 'react-router-dom'
+import Login from './pages/Login'
+import { isStaffAuthenticated } from './lib/auth'
+import Footer from './components/Footer'
 import { BusquedaSoftwarePage } from './pages/BusquedaSoftwarePage'
 import { BusquedaCarreraPage } from './pages/BusquedaCarreraPage'
 import { BusquedaJuegoPage } from './pages/BusquedaJuegoPage'
@@ -13,7 +17,7 @@ const App: FC = () => {
   const isHome = location.pathname === "/";
 
   return (
-    <div>
+    <div className="app-surface">
       {!isHome && (
 
         <nav
@@ -38,7 +42,10 @@ const App: FC = () => {
         <Route path="/busqueda-carrera" element={<BusquedaCarreraPage />} />
         <Route path="/busqueda-juego" element={<BusquedaJuegoPage />} />
         <Route path="/recomendacion" element={<RecomendacionPage />} />
+        <Route path="/panel" element={isStaffAuthenticated() ? <PanelDeAdmin /> : <Navigate to="/login" replace />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
+      {location.pathname !== '/panel' && <Footer />}
     </div>
   )
 }

@@ -10,6 +10,11 @@ body {
   justify-content: center; 
   min-height: 100vh;
   background-color: #b0c4b1;
+  /* top-centered background image with shading overlay */
+  background-image: linear-gradient(to bottom, rgba(36,24,18,0.45), rgba(255,255,255,0.85)), url('../assets/fondo proyecto.avif');
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-size: cover;
   text-align: center;
 }
 
@@ -32,4 +37,15 @@ body {
 .modulos {
   display: flex;
   gap: 20px;
+}
+
+.admin-top-button {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+}
+
+/* ensure container allows absolute child positioning */
+.container {
+  position: relative;
 }
