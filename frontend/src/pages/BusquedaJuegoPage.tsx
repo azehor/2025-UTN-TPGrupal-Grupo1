@@ -4,7 +4,7 @@ import { BusquedaJuegoSinEstilos } from "../components/BusquedaJuegoSinEstilosPa
 
 export const BusquedaJuegoPage: FC = () => {
     return <>
-        {/* <BusquedaJuego /> */}
-        <BusquedaJuegoSinEstilos/>
+         <BusquedaJuego />
+        { /*<BusquedaJuegoSinEstilos / >*/}
     </>
 }
