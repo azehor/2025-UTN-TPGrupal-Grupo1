@@ -39,7 +39,7 @@ func Start(port string) {
 
 	dbPostgresql.InitDB()
 
-	carrerasStore := cStore.New()
+	carrerasStore := cStore.New(dbPostgresql.DB)
 	carreras := carreras.New(carrerasStore)
 
 	softwaresStore := sStore.New(dbPostgresql.DB)
