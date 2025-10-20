@@ -7,9 +7,9 @@ type DTO struct {
 }
 
 type Carrera struct {
-	ID       string
-	Nombre   string
-	ImageURL string
+	ID       string `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	Nombre   string `gorm:"type:varchar(100);not null"`
+	ImageURL string `gorm:"type:text"`
 }
 
 type Carreras []*Carrera

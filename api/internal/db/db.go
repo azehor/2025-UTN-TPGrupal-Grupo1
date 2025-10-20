@@ -9,6 +9,8 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
+	carreraSoftwareModel "quepc/api/internal/carreraSoftware/model"
+	carrerasModel "quepc/api/internal/carreras/model"
 	softwaresModel "quepc/api/internal/softwares/model"
 )
 
@@ -37,7 +39,7 @@ func InitDB() {
 		log.Fatalf("Error al conectar a la base de datos: %v", err)
 	}
 
-	if err := db.AutoMigrate(&softwaresModel.Software{}); err != nil {
+	if err := db.AutoMigrate(&softwaresModel.Software{}, &carrerasModel.Carrera{}, &carreraSoftwareModel.CarreraSoftware{}); err != nil {
 		log.Fatalf("Error al migrar tablas: %v", err)
 	}
 	DB = db
