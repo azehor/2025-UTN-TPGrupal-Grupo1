@@ -16,6 +16,9 @@ import (
 	"quepc/api/internal/softwares"
 	sStore "quepc/api/internal/softwares/store"
 
+	carrerasoftware "quepc/api/internal/carreraSoftware"
+	csStore "quepc/api/internal/carreraSoftware/store"
+
 	transport "quepc/api/internal/transport/http"
 
 	//external library imports
@@ -45,9 +48,12 @@ func Start(port string) {
 	softwaresStore := sStore.New(dbPostgresql.DB)
 	softwares := softwares.New(softwaresStore)
 
+	csStoreInst := csStore.New(dbPostgresql.DB)
+	carreraSoftwares := carrerasoftware.New(csStoreInst)
+
 	recomendaciones := recomendaciones.New()
 
-	httpServer := transport.New(carreras, softwares, recomendaciones)
+	httpServer := transport.New(carreras, softwares, recomendaciones, carreraSoftwares)
 	httpServer.AddRoutes(r)
 
 	c := make(chan os.Signal, 1)
