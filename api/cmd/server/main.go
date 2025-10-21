@@ -11,6 +11,7 @@ import (
 	//internal project imports
 	"quepc/api/internal/carreras"
 	cStore "quepc/api/internal/carreras/store"
+	"quepc/api/internal/middleware"
 	"quepc/api/internal/recomendaciones"
 
 	"quepc/api/internal/softwares"
@@ -21,16 +22,36 @@ import (
 
 	transport "quepc/api/internal/transport/http"
 
+	//imports de componentes
+	"quepc/api/internal/componentes"
+
+	"quepc/api/internal/componentes/discos"
+	"quepc/api/internal/componentes/gabinetes"
+	"quepc/api/internal/componentes/gpus"
+	"quepc/api/internal/componentes/motherboards"
+	"quepc/api/internal/componentes/procesadores"
+	"quepc/api/internal/componentes/psus"
+	"quepc/api/internal/componentes/rams"
+
+	dsStore "quepc/api/internal/componentes/discos/store"
+	gsStore "quepc/api/internal/componentes/gabinetes/store"
+	gpStore "quepc/api/internal/componentes/gpus/store"
+	mbStore "quepc/api/internal/componentes/motherboards/store"
+	prsStore "quepc/api/internal/componentes/procesadores/store"
+	psStore "quepc/api/internal/componentes/psus/store"
+	rmsStore "quepc/api/internal/componentes/rams/store"
+
+	dbPostgresql "quepc/api/internal/db"
+
 	//external library imports
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
-
-	dbPostgresql "quepc/api/internal/db"
 )
 
 func Start(port string) {
 	r := chi.NewRouter()
 
+	r.Use(middleware.ContentTypeMiddleware)
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:5173"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -53,7 +74,34 @@ func Start(port string) {
 
 	recomendaciones := recomendaciones.New()
 
-	httpServer := transport.New(carreras, softwares, recomendaciones, carreraSoftwares)
+	// inicializacion de componentes
+	discosStore := dsStore.New(dbPostgresql.DB)
+	discos := discos.New(discosStore)
+	gabinetesStore := gsStore.New(dbPostgresql.DB)
+	gabinetes := gabinetes.New(gabinetesStore)
+	gpusStore := gpStore.New(dbPostgresql.DB)
+	gpus := gpus.New(gpusStore)
+	motherboardsStore := mbStore.New(dbPostgresql.DB)
+	motherboards := motherboards.New(motherboardsStore)
+	procesadoresStore := prsStore.New(dbPostgresql.DB)
+	procesadores := procesadores.New(procesadoresStore)
+	psusStore := psStore.New(dbPostgresql.DB)
+	psus := psus.New(psusStore)
+	ramsStore := rmsStore.New(dbPostgresql.DB)
+	rams := rams.New(ramsStore)
+	componentes := componentes.New(discos,
+		gabinetes,
+		gpus,
+		motherboards,
+		procesadores,
+		psus,
+		rams)
+
+	httpServer := transport.New(carreras,
+		softwares,
+		recomendaciones,
+		carreraSoftwares,
+		componentes)
 	httpServer.AddRoutes(r)
 
 	c := make(chan os.Signal, 1)

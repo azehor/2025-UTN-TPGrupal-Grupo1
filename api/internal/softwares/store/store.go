@@ -3,7 +3,7 @@ package store
 import (
 	"fmt"
 	"quepc/api/internal/softwares/model"
-	"regexp"
+	"quepc/api/utils"
 
 	"gorm.io/gorm"
 )
@@ -11,9 +11,6 @@ import (
 type Store struct {
 	db *gorm.DB
 }
-
-// Expresion regex para validar formato de uuid
-var uuidRegexp = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
 
 func New(db *gorm.DB) *Store {
 	return &Store{db: db}
@@ -37,7 +34,7 @@ func (s *Store) Create(software *model.Software) (*model.Software, error) {
 func (s *Store) Read(id string) (*model.Software, error) {
 	var sw model.Software
 	// Validar formato UUID
-	if !uuidRegexp.MatchString(id) {
+	if !utils.ValidarUUID(id) {
 		return nil, fmt.Errorf("id invalido")
 	}
 	if err := s.db.First(&sw, "id = ?", id).Error; err != nil {
@@ -51,7 +48,7 @@ func (s *Store) Read(id string) (*model.Software, error) {
 
 func (s *Store) Update(software *model.Software) (int64, error) {
 	// Validar formato UUID
-	if !uuidRegexp.MatchString(software.ID) {
+	if !utils.ValidarUUID(software.ID) {
 		return 0, fmt.Errorf("id invalido")
 	}
 	res := s.db.Model(&model.Software{}).Where("id = ?", software.ID).Updates(software)
@@ -60,7 +57,7 @@ func (s *Store) Update(software *model.Software) (int64, error) {
 
 func (s *Store) Delete(id string) (int64, error) {
 	// Validar formato UUID
-	if !uuidRegexp.MatchString(id) {
+	if !utils.ValidarUUID(id) {
 		return 0, fmt.Errorf("id invalido")
 	}
 	res := s.db.Delete(&model.Software{}, "id = ?", id)
