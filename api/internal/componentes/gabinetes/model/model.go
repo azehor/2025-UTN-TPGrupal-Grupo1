@@ -13,7 +13,7 @@ type DTO struct {
 }
 
 type Gabinete struct {
-	ID          string `gorm:"primaryKey;type:uuid;default:gen_random_uuid"`
+	ID          string `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	Nombre      string `gorm:"type:varchar(100);not null"`
 	Fabricante  string `gorm:"type:varchar(20);not null"`
 	FormFactor  string `gorm:"type:varchar(10);not null"`

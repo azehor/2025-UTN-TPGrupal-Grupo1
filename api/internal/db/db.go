@@ -11,6 +11,13 @@ import (
 
 	carreraSoftwareModel "quepc/api/internal/carreraSoftware/model"
 	carrerasModel "quepc/api/internal/carreras/model"
+	discosModel "quepc/api/internal/componentes/discos/model"
+	gabinetesModel "quepc/api/internal/componentes/gabinetes/model"
+	gpusModel "quepc/api/internal/componentes/gpus/model"
+	motherboardsModel "quepc/api/internal/componentes/motherboards/model"
+	procesadoresModel "quepc/api/internal/componentes/procesadores/model"
+	psusModel "quepc/api/internal/componentes/psus/model"
+	ramsModel "quepc/api/internal/componentes/rams/model"
 	softwaresModel "quepc/api/internal/softwares/model"
 )
 
@@ -39,7 +46,16 @@ func InitDB() {
 		log.Fatalf("Error al conectar a la base de datos: %v", err)
 	}
 
-	if err := db.AutoMigrate(&softwaresModel.Software{}, &carrerasModel.Carrera{}, &carreraSoftwareModel.CarreraSoftware{}); err != nil {
+	if err := db.AutoMigrate(&softwaresModel.Software{},
+		&carrerasModel.Carrera{},
+		&carreraSoftwareModel.CarreraSoftware{},
+		&discosModel.Disco{},
+		&gabinetesModel.Gabinete{},
+		&gpusModel.GPU{},
+		&motherboardsModel.Motherboard{},
+		&procesadoresModel.Procesador{},
+		&psusModel.PSU{},
+		&ramsModel.RAM{}); err != nil {
 		log.Fatalf("Error al migrar tablas: %v", err)
 	}
 	DB = db

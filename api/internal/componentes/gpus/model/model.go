@@ -15,7 +15,7 @@ type DTO struct {
 }
 
 type GPU struct {
-	ID         string `gorm:"primaryKey;type:uuid;default:gen_random_uuid"`
+	ID         string `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	Nombre     string `gorm:"type:varchar(100);not null"`
 	Fabricante string `gorm:"type:varchar(20);not null"`
 	Modelo     string `gorm:"type:varchar(100);not null"`
