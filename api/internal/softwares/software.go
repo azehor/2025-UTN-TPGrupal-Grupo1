@@ -12,6 +12,7 @@ import (
 
 type Store interface {
 	List() (model.Softwares, error)
+	ListByTipo(string) (model.Softwares, error)
 	Create(*model.Software) (*model.Software, error)
 	Read(string) (*model.Software, error)
 	Update(*model.Software) (int64, error)
@@ -31,8 +32,11 @@ func New(s Store) *Softwares {
 func (s *Softwares) List(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// Traer listado de software de la base de datos
-	softwares, err := s.store.List()
+	// Leer query param opcional 'tipo' (normal, juego)
+	tipo := r.URL.Query().Get("tipo")
+
+	// Traer listado de software de la base de datos (posible filtrado por tipo)
+	softwares, err := s.store.ListByTipo(tipo)
 	if err != nil {
 		slog.Error("Error en la base de datos al listar softwares", "error", err)
 		http.Error(w, `{"error":"Error interno del servidor"}`, http.StatusInternalServerError)
