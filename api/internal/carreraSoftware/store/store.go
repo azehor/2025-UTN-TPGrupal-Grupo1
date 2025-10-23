@@ -3,7 +3,7 @@ package store
 import (
 	"fmt"
 	"quepc/api/internal/carreraSoftware/model"
-	"regexp"
+	"quepc/api/utils"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -12,9 +12,6 @@ import (
 type Store struct {
 	db *gorm.DB
 }
-
-// Expresion regex para validar formato de uuid
-var uuidRegexp = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
 
 func New(db *gorm.DB) *Store {
 	return &Store{db: db}
@@ -38,7 +35,7 @@ func (s *Store) Create(carrera *model.CarreraSoftware) (*model.CarreraSoftware, 
 // Retorna la entidad creada o la existente (preloaded) sin error.
 func (s *Store) CreateIfNotExists(rel *model.CarreraSoftware) (*model.CarreraSoftware, error) {
 	// Validar formato UUID de las llaves foraneas
-	if !uuidRegexp.MatchString(rel.CarreraID) || !uuidRegexp.MatchString(rel.SoftwareID) {
+	if !utils.ValidarUUID(rel.CarreraID) || !utils.ValidarUUID(rel.SoftwareID) {
 		return nil, fmt.Errorf("carrera_id o software_id invalidos")
 	}
 
@@ -70,7 +67,7 @@ func (s *Store) CreateIfNotExists(rel *model.CarreraSoftware) (*model.CarreraSof
 func (s *Store) Read(id string) (*model.CarreraSoftware, error) {
 	var sw model.CarreraSoftware
 	// Validar formato UUID
-	if !uuidRegexp.MatchString(id) {
+	if !utils.ValidarUUID(id) {
 		return nil, fmt.Errorf("id invalido")
 	}
 	if err := s.db.Preload("Carrera").Preload("Software").First(&sw, "id = ?", id).Error; err != nil {
@@ -84,7 +81,7 @@ func (s *Store) Read(id string) (*model.CarreraSoftware, error) {
 
 func (s *Store) ListByCarrera(carreraID string) (model.CarreraSoftwares, error) {
 	var list model.CarreraSoftwares
-	if !uuidRegexp.MatchString(carreraID) {
+	if !utils.ValidarUUID(carreraID) {
 		return nil, fmt.Errorf("id invalido")
 	}
 	if err := s.db.Preload("Software").Where("carrera_id = ?", carreraID).Find(&list).Error; err != nil {
@@ -95,7 +92,7 @@ func (s *Store) ListByCarrera(carreraID string) (model.CarreraSoftwares, error) 
 
 func (s *Store) ListBySoftware(softwareID string) (model.CarreraSoftwares, error) {
 	var list model.CarreraSoftwares
-	if !uuidRegexp.MatchString(softwareID) {
+	if !utils.ValidarUUID(softwareID) {
 		return nil, fmt.Errorf("id invalido")
 	}
 	if err := s.db.Preload("Carrera").Where("software_id = ?", softwareID).Find(&list).Error; err != nil {
@@ -105,7 +102,7 @@ func (s *Store) ListBySoftware(softwareID string) (model.CarreraSoftwares, error
 }
 
 func (s *Store) DeleteByCarreraAndSoftware(carreraID, softwareID string) (int64, error) {
-	if !uuidRegexp.MatchString(carreraID) || !uuidRegexp.MatchString(softwareID) {
+	if !utils.ValidarUUID(carreraID) || !utils.ValidarUUID(softwareID) {
 		return 0, fmt.Errorf("id invalido")
 	}
 	res := s.db.Delete(&model.CarreraSoftware{}, "carrera_id = ? AND software_id = ?", carreraID, softwareID)
@@ -114,7 +111,7 @@ func (s *Store) DeleteByCarreraAndSoftware(carreraID, softwareID string) (int64,
 
 func (s *Store) Delete(id string) (int64, error) {
 	// Validar formato UUID
-	if !uuidRegexp.MatchString(id) {
+	if !utils.ValidarUUID(id) {
 		return 0, fmt.Errorf("id invalido")
 	}
 	res := s.db.Delete(&model.CarreraSoftware{}, "id = ?", id)
