@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"quepc/api/internal/softwares/model"
 	"quepc/api/utils"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -19,6 +20,21 @@ func New(db *gorm.DB) *Store {
 func (s *Store) List() (model.Softwares, error) {
 	var list model.Softwares
 	if err := s.db.Find(&list).Error; err != nil {
+		return nil, err
+	}
+	return list, nil
+}
+
+// ListByTipo lista todos los softwares, o filtra por tipo cuando se pasa un valor
+func (s *Store) ListByTipo(tipo string) (model.Softwares, error) {
+	var list model.Softwares
+	var err error
+	if strings.TrimSpace(tipo) == "" {
+		err = s.db.Find(&list).Error
+	} else {
+		err = s.db.Where("tipo = ?", tipo).Find(&list).Error
+	}
+	if err != nil {
 		return nil, err
 	}
 	return list, nil
