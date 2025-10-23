@@ -2,7 +2,7 @@ import type { FC } from 'react'
 import './App.css'
 import Home from "./pages/Home"
 import PanelDeAdmin from './pages/PanelDeAdmin'
-import { Link, Route, Routes, useLocation, Navigate } from 'react-router-dom'
+import { Route, Routes, useLocation, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import { isStaffAuthenticated } from './lib/auth'
 import Footer from './components/Footer'
@@ -10,31 +10,16 @@ import { BusquedaSoftwarePage } from './pages/BusquedaSoftwarePage'
 import { BusquedaCarreraPage } from './pages/BusquedaCarreraPage'
 import { BusquedaJuegoPage } from './pages/BusquedaJuegoPage'
 import { RecomendacionPage } from './pages/RecomendacionPage'
+import { Header } from './components/Header'
 
 
 const App: FC = () => {
   const location = useLocation();
-  const isHome = location.pathname === "/";
 
   return (
-    <div className="app-surface">
-      {!isHome && (
+    <div className="app-surface min-h-screen bg-gray-100">
 
-        <nav
-          style={{
-            display: "flex",
-            gap: "1rem",
-            padding: "1rem",
-            borderBottom: "1px solid #ccc",
-            marginBottom: "1rem",
-            justifyContent: "center"
-          }}>
-          <Link to="/">Inicio</Link>
-          <Link to="/busqueda-software">Buscar por Software</Link>
-          <Link to="/busqueda-carrera">Buscar por Carrera</Link>
-          <Link to="/busqueda-juego">Buscar por Juego</Link>
-        </nav>
-      )}
+      <Header />
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -49,6 +34,5 @@ const App: FC = () => {
     </div>
   )
 }
-
 
 export default App
