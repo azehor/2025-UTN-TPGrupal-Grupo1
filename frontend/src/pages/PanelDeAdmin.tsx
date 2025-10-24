@@ -242,19 +242,19 @@ const PanelDeAdmin: FC = () => {
 	};
 
 	return (
-		<div className="relative flex min-h-screen bg-gray-50 dark:bg-gray-900 font-sans">
+		<div className="relative flex min-h-screen bg-[#101c22] font-['Space_Grotesk',sans-serif]">
 			{/* Sidebar Navigation */}
-			<aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
-				<div className="p-4 border-b border-gray-200 dark:border-gray-700">
-					<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">PC Recs Admin</h1>
+			<aside className="w-64 bg-[#1a2831] border-r border-gray-600 flex flex-col">
+				<div className="p-4 border-b border-gray-600">
+					<h1 className="text-2xl font-bold text-white">PC Recs Admin</h1>
 				</div>
 				<nav className="flex-1 p-4 space-y-2">
 					<a 
 						href="#" 
 						className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium ${
 							viewMode === 'choose' 
-								? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' 
-								: 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+								? 'bg-[#13a4ec]/20 text-[#13a4ec]' 
+								: 'text-gray-400 hover:bg-gray-700 hover:text-white'
 						}`}
 						onClick={(e) => { e.preventDefault(); setViewMode('choose'); }}
 					>
@@ -267,8 +267,8 @@ const PanelDeAdmin: FC = () => {
 							href="#"
 							className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium ${
 								selectedType === entity.key && viewMode !== 'choose'
-									? 'bg-blue-500/20 text-blue-600 dark:text-blue-400'
-									: 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+									? 'bg-[#13a4ec]/20 text-[#13a4ec]'
+									: 'text-gray-400 hover:bg-gray-700 hover:text-white'
 							}`}
 							onClick={(e) => {
 								e.preventDefault();
@@ -283,10 +283,10 @@ const PanelDeAdmin: FC = () => {
 						</a>
 					))}
 				</nav>
-				<div className="p-4 border-t border-gray-200 dark:border-gray-700">
+				<div className="p-4 border-t border-gray-600">
 					<button
 						onClick={() => { logoutStaff(); navigate('/login'); }}
-						className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 w-full font-medium"
+						className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white w-full font-medium"
 					>
 						<span className="material-symbols-outlined text-xl">logout</span>
 						<span>Cerrar sesión</span>
@@ -297,7 +297,7 @@ const PanelDeAdmin: FC = () => {
 			{/* Main Content */}
 			<div className="flex-1 flex flex-col">
 				{/* Top Header Bar */}
-				<header className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+				<header className="flex items-center justify-between p-4 bg-[#1a2831] border-b border-gray-600">
 					<div className="relative w-full max-w-md">
 						<span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
 						<input 
@@ -319,7 +319,7 @@ const PanelDeAdmin: FC = () => {
 				</header>
 
 				{/* Main Content Area */}
-				<main className="flex-1 p-6 space-y-6 bg-gray-50 dark:bg-gray-900">
+				<main className="flex-1 p-6 space-y-6 bg-[#101c22]">
 					{viewMode === 'choose' && (
 						<div>
 							{/* Page Heading */}
@@ -329,27 +329,27 @@ const PanelDeAdmin: FC = () => {
 
 							{/* Stats */}
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-								<div className="flex flex-col gap-2 rounded-lg p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-									<p className="text-gray-600 dark:text-gray-400 text-base font-medium leading-normal">Total Software</p>
-									<p className="text-gray-900 dark:text-gray-100 tracking-light text-2xl font-bold leading-tight">
+								<div className="flex flex-col gap-2 rounded-lg p-6 bg-[#1a2831] border border-gray-600">
+									<p className="text-gray-400 text-base font-medium leading-normal">Total Software</p>
+									<p className="text-white tracking-light text-2xl font-bold leading-tight">
 										{statsLoading ? '...' : (statsData.software || 0)}
 									</p>
 								</div>
-								<div className="flex flex-col gap-2 rounded-lg p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-									<p className="text-gray-600 dark:text-gray-400 text-base font-medium leading-normal">Total Procesadores</p>
-									<p className="text-gray-900 dark:text-gray-100 tracking-light text-2xl font-bold leading-tight">
+								<div className="flex flex-col gap-2 rounded-lg p-6 bg-[#1a2831] border border-gray-600">
+									<p className="text-gray-400 text-base font-medium leading-normal">Total Procesadores</p>
+									<p className="text-white tracking-light text-2xl font-bold leading-tight">
 										{statsLoading ? '...' : (statsData.procesador || 0)}
 									</p>
 								</div>
-								<div className="flex flex-col gap-2 rounded-lg p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-									<p className="text-gray-600 dark:text-gray-400 text-base font-medium leading-normal">Total Placas Gráficas</p>
-									<p className="text-gray-900 dark:text-gray-100 tracking-light text-2xl font-bold leading-tight">
+								<div className="flex flex-col gap-2 rounded-lg p-6 bg-[#1a2831] border border-gray-600">
+									<p className="text-gray-400 text-base font-medium leading-normal">Total Placas Gráficas</p>
+									<p className="text-white tracking-light text-2xl font-bold leading-tight">
 										{statsLoading ? '...' : (statsData.placaGrafica || 0)}
 									</p>
 								</div>
-								<div className="flex flex-col gap-2 rounded-lg p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-									<p className="text-gray-600 dark:text-gray-400 text-base font-medium leading-normal">Total Almacenamiento</p>
-									<p className="text-gray-900 dark:text-gray-100 tracking-light text-2xl font-bold leading-tight">
+								<div className="flex flex-col gap-2 rounded-lg p-6 bg-[#1a2831] border border-gray-600">
+									<p className="text-gray-400 text-base font-medium leading-normal">Total Almacenamiento</p>
+									<p className="text-white tracking-light text-2xl font-bold leading-tight">
 										{statsLoading ? '...' : (statsData.almacenamiento || 0)}
 									</p>
 								</div>
