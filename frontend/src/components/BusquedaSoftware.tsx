@@ -85,127 +85,81 @@ export const BusquedaSoftware: React.FC = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h2>Buscar por Software</h2>
+    <div className="min-h-screen bg-[#101c22] text-gray-300 font-['Space_Grotesk',sans-serif] py-8">
+      <div className="container mx-auto px-6 max-w-4xl">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">Buscar por Software</h2>
 
-      <div style={styles.inputWrap}>
-        <input
-          ref={inputRef}
-          type="text"
-          value={q}
-          placeholder="Buscar..."
-          onChange={(e) => setQ(e.target.value)}
-          onKeyDown={onKeyDown}
-          style={styles.input}
-        />
-        {filtered.length > 0 && (
-          <ul style={styles.suggList}>
-            {filtered.map((f, i) => (
-              <li
-                key={f.id}
-                onMouseDown={(ev) => { ev.preventDefault(); addToStack(f); }}
-                onMouseEnter={() => setHighlight(i)}
-                style={{
-                  ...styles.suggItem,
-                  ...(i === highlight ? styles.suggItemActive : {})
-                }}
-              >
-                {f.nombre} – {f.empresa}
-              </li>
-            ))}
-          </ul>
+        <div className="relative mb-6">
+          <input
+            ref={inputRef}
+            type="text"
+            value={q}
+            placeholder="Buscar software..."
+            onChange={(e) => setQ(e.target.value)}
+            onKeyDown={onKeyDown}
+            className="w-full px-4 py-3 bg-[#1a2831] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#13a4ec] focus:ring-2 focus:ring-[#13a4ec]/20 transition-all"
+          />
+          {filtered.length > 0 && (
+            <ul className="absolute left-0 right-0 mt-2 bg-[#1a2831] border border-gray-600 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+              {filtered.map((f, i) => (
+                <li
+                  key={f.id}
+                  onMouseDown={(ev) => { ev.preventDefault(); addToStack(f); }}
+                  onMouseEnter={() => setHighlight(i)}
+                  className={`px-4 py-3 cursor-pointer transition-colors border-b border-gray-700 last:border-b-0 ${
+                    i === highlight ? 'bg-[#13a4ec] text-white' : 'hover:bg-gray-700'
+                  }`}
+                >
+                  <span className="font-medium">{f.nombre}</span>
+                  <span className="text-gray-400 ml-2">– {f.empresa}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {error && (
+          <div className="bg-red-900/20 border border-red-500/50 text-red-300 px-4 py-3 rounded-lg mb-6">
+            {error}
+          </div>
         )}
+
+        {stack.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold text-white mb-4">Software Seleccionado:</h3>
+            <div className="space-y-3">
+              {stack.map(item => (
+                <div key={item.id} className="flex items-center justify-between bg-[#1a2831] border border-gray-600 rounded-lg px-4 py-3">
+                  <div>
+                    <span className="font-medium text-white">{item.nombre}</span>
+                    <span className="text-gray-400 ml-2">– {item.empresa}</span>
+                  </div>
+                  <button
+                    onClick={() => removeFromStack(item.id)}
+                    className="ml-4 text-gray-400 hover:text-red-400 transition-colors text-xl leading-none"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <Link to="/recomendacion">
+          <button
+            disabled={stack.length === 0}
+            className={`w-full py-3 px-8 rounded-lg font-bold text-lg transition-all ${
+              stack.length === 0
+                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                : 'bg-[#13a4ec] text-white hover:opacity-90'
+            }`}
+          >
+            Recomendar PC
+          </button>
+        </Link>
       </div>
-
-      {error && <p style={styles.error}>{error}</p>}
-
-      <ul style={styles.stackList}>
-        {stack.map(item => (
-          <li key={item.id} style={styles.stackItem}>
-            <span>{item.nombre} – {item.empresa}</span>
-            <button
-              onClick={() => removeFromStack(item.id)}
-              style={styles.removeBtn}
-            >
-              ✕
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      {/* Botón al final */}
-      <Link to="/recomendacion">
-      <button
-        disabled={stack.length === 0}
-        style={{
-          ...styles.actionBtn,
-          ...(stack.length === 0 ? styles.actionBtnDisabled : {})
-        }}
-      >
-        Recomendar PC
-      </button>
-      </Link>
     </div>
   );
 };
 
-// Estilos básicos
-const styles: Record<string, React.CSSProperties> = {
-  container: { width: "100%", maxWidth: 720, fontFamily: "Inter, sans-serif", padding: "1rem", margin: "0 auto" },
-  inputWrap: { position: "relative" },
-  input: { width: "100%", padding: "10px 12px", fontSize: 14, boxSizing: "border-box" },
-  suggList: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    marginTop: 4,
-    background: "#fff",
-    border: "1px solid #ddd",
-    listStyle: "none",
-    padding: 0,
-    zIndex: 50
-  },
-  suggItem: { padding: "8px 10px", cursor: "pointer" },
-  suggItemActive: { background: "#efefef" },
-  stackList: {
-    marginTop: 16,
-    padding: 0,
-    listStyle: "none",
-    display: "flex",
-    flexDirection: "column",
-    gap: 8
-  },
-  stackItem: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "8px 12px",
-    border: "1px solid #ddd",
-    borderRadius: 6,
-    background: "#fafafa"
-  },
-  removeBtn: {
-    marginLeft: 8,
-    border: "none",
-    background: "transparent",
-    cursor: "pointer",
-    fontSize: 16,
-    lineHeight: 1
-  },
-  error: { color: "red", fontSize: 14, marginTop: 8 },
-  actionBtn: {
-    marginTop: 20,
-    width: "100%",
-    padding: "12px",
-    borderRadius: 6,
-    border: "none",
-    cursor: "pointer",
-    background: "#007bff",
-    color: "#fff",
-    fontSize: 16
-  },
-  actionBtnDisabled: {
-    background: "#ccc",
-    cursor: "not-allowed"
-  }
-};

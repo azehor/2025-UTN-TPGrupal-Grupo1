@@ -46,81 +46,82 @@ export const BusquedaCarrera: React.FC = () => {
   };
 
   return (
-    <div style={{ fontFamily: "sans-serif", padding: "1rem", maxWidth: "900px", margin: "0 auto" }}>
-      <h2>Buscar por carrera</h2>
-      <input
-        type="text"
-        placeholder="Type to search..."
-        value={query}
-        onChange={e => setQuery(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "0.5rem",
-          marginBottom: "1rem",
-          border: "1px solid #ccc",
-          borderRadius: "6px"
-        }}
-      />
+    <div className="min-h-screen bg-[#101c22] text-gray-300 font-['Space_Grotesk',sans-serif] py-8">
+      <div className="container mx-auto px-6 max-w-6xl">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">Buscar por Carrera</h2>
+        
+        <div className="mb-8">
+          <input
+            type="text"
+            placeholder="Busca tu carrera..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            className="w-full px-4 py-3 bg-[#1a2831] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#13a4ec] focus:ring-2 focus:ring-[#13a4ec]/20 transition-all"
+          />
+        </div>
 
-      {loading && <p>Cargando...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-          gap: "12px"
-        }}
-      >
-        {filteredList.length > 0 ? (
-          filteredList.map((carrera) => (
-            <div
-              key={carrera.id}
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                padding: "8px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "stretch",
-                background: "#fff",
-                boxShadow: selectedId === carrera.id ? "0 0 0 3px rgba(0,123,255,0.12)" : undefined
-              }}
-            >
-              {carrera.imageURL ? (
-                <img
-                  src={carrera.imageURL}
-                  alt={carrera.nombre}
-                  style={{ width: "100%", height: "110px", objectFit: "cover", borderRadius: "6px", marginBottom: "8px" }}
-                />
-              ) : (
-                <div style={{ width: "100%", height: "110px", background: "#f4f4f4", borderRadius: "6px", marginBottom: "8px" }} />
-              )}
-
-              <div style={{ flex: 1, marginBottom: "8px", fontWeight: 600 }}>{carrera.nombre}</div>
-              
-              <Link to="/recomendacion">
-              <button
-                onClick={() => handleAccion(carrera)}
-                style={{
-                  padding: "8px",
-                  borderRadius: "6px",
-                  border: "none",
-                  background: selectedId === carrera.id ? "#0056b3" : "#007bff",
-                  color: "#fff",
-                  cursor: "pointer"
-                }}
-              >
-                Seleccionar
-              </button>
-              </Link>
-            </div>
-          ))
-        ) : (
-          <div style={{ gridColumn: "1/-1" }}>
-            <p>No se encontró carrera</p>
+        {loading && (
+          <div className="text-center py-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#13a4ec]"></div>
+            <p className="mt-4 text-gray-400">Cargando carreras...</p>
           </div>
         )}
+        
+        {error && (
+          <div className="bg-red-900/20 border border-red-500/50 text-red-300 px-4 py-3 rounded-lg mb-6">
+            {error}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {filteredList.length > 0 ? (
+            filteredList.map((carrera) => (
+              <div
+                key={carrera.id}
+                className={`bg-[#1a2831] border rounded-xl p-4 flex flex-col transition-all duration-300 hover:shadow-lg hover:shadow-[#13a4ec]/20 ${
+                  selectedId === carrera.id 
+                    ? 'border-[#13a4ec] shadow-lg shadow-[#13a4ec]/20' 
+                    : 'border-gray-600 hover:border-[#13a4ec]/50'
+                }`}
+              >
+                {carrera.imageURL ? (
+                  <img
+                    src={carrera.imageURL}
+                    alt={carrera.nombre}
+                    className="w-full h-32 object-cover rounded-lg mb-4"
+                  />
+                ) : (
+                  <div className="w-full h-32 bg-gray-700 rounded-lg mb-4 flex items-center justify-center">
+                    <span className="text-gray-500 text-sm">Sin imagen</span>
+                  </div>
+                )}
+
+                <div className="flex-1 mb-4">
+                  <h3 className="font-semibold text-white text-lg leading-tight">{carrera.nombre}</h3>
+                </div>
+                
+                <Link to="/recomendacion" className="w-full">
+                  <button
+                    onClick={() => handleAccion(carrera)}
+                    className={`w-full py-2 px-4 rounded-lg font-medium transition-all ${
+                      selectedId === carrera.id 
+                        ? 'bg-[#0d7ec1] text-white' 
+                        : 'bg-[#13a4ec] text-white hover:opacity-90'
+                    }`}
+                  >
+                    Seleccionar
+                  </button>
+                </Link>
+              </div>
+            ))
+          ) : !loading && (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-400 text-lg">
+                {query.trim() ? 'No se encontraron carreras que coincidan con tu búsqueda' : 'No hay carreras disponibles'}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
