@@ -6,6 +6,7 @@ type DTO struct {
 	Tipo     string `json:"tipo"`
 	Precio   string `json:"precio"`
 	ImageURL string `json:"image_url"`
+	Orden    int    `json:"orden"`
 }
 
 type Componente struct {
@@ -14,6 +15,7 @@ type Componente struct {
 	Tipo     string
 	Precio   string
 	ImageURL string
+	Orden    int
 }
 
 type Recomendacion []*Componente
@@ -25,6 +27,7 @@ func (c *Componente) ToDto() *DTO {
 		Tipo:     c.Tipo,
 		Precio:   c.Precio,
 		ImageURL: c.ImageURL,
+		Orden:    c.Orden,
 	}
 }
 

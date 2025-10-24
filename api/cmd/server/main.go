@@ -46,6 +46,7 @@ import (
 	//external library imports
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/docgen"
 )
 
 func Start(port string) {
@@ -72,8 +73,6 @@ func Start(port string) {
 	csStoreInst := csStore.New(dbPostgresql.DB)
 	carreraSoftwares := carrerasoftware.New(csStoreInst)
 
-	recomendaciones := recomendaciones.New()
-
 	// inicializacion de componentes
 	discosStore := dsStore.New(dbPostgresql.DB)
 	discos := discos.New(discosStore)
@@ -97,12 +96,24 @@ func Start(port string) {
 		psus,
 		rams)
 
+	recomendaciones := recomendaciones.New(softwaresStore, csStoreInst, gpusStore, procesadoresStore, ramsStore, discosStore, gabinetesStore, motherboardsStore, psusStore)
+
 	httpServer := transport.New(carreras,
 		softwares,
 		recomendaciones,
 		carreraSoftwares,
 		componentes)
 	httpServer.AddRoutes(r)
+
+	// Se busca la variable de entorno y en base a eso se genera o no la documentacion
+	if os.Getenv("GENERATE_DOCS") == "1" {
+		_ = os.MkdirAll("docs", 0o755)
+		md := docgen.MarkdownRoutesDoc(r, docgen.MarkdownOpts{Intro: "## Endpoints\n\n"})
+		_ = os.WriteFile("docs/routes.md", []byte(md), 0o644)
+
+		fmt.Println("Documentacion generada en docs/routes.md")
+		return
+	}
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
