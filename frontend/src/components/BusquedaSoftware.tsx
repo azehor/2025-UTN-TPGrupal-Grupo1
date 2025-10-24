@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useBusqueda } from "../context/BusquedaContext";
 
 interface Software {
   id: string;
@@ -12,6 +13,7 @@ interface Software {
   orden_ram: number;
 }
 
+
 export const BusquedaSoftware: React.FC = () => {
   const [q, setQ] = useState<string>("");
   const [softwares, setSoftwares] = useState<Software[]>([]);
@@ -20,6 +22,9 @@ export const BusquedaSoftware: React.FC = () => {
   const [stack, setStack] = useState<Software[]>([]);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  const navigate = useNavigate();
+  const { setBusqueda } = useBusqueda();
 
   // Fetch API
   useEffect(() => {
@@ -89,6 +94,12 @@ export const BusquedaSoftware: React.FC = () => {
     inputRef.current?.focus();
   };
 
+ const onRecomendar = () => {
+    const ids = stack.map((s) => s.id);
+    setBusqueda("software", { ids, items: stack }); 
+    navigate("/recomendacion");
+  };
+
   return (
     <div className="min-h-screen bg-[#101c22] text-gray-300 font-['Space_Grotesk',sans-serif] py-8">
       <div className="container mx-auto px-6 max-w-4xl">
@@ -151,8 +162,9 @@ export const BusquedaSoftware: React.FC = () => {
           </div>
         )}
 
-        <Link to="/recomendacion">
+      
           <button
+            onClick={() => onRecomendar()}
             disabled={stack.length === 0}
             className={`w-full py-3 px-8 rounded-lg font-bold text-lg transition-all ${
               stack.length === 0
@@ -162,7 +174,6 @@ export const BusquedaSoftware: React.FC = () => {
           >
             Recomendar PC
           </button>
-        </Link>
       </div>
     </div>
   );
