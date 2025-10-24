@@ -6,6 +6,10 @@ interface Software {
   nombre: string;
   empresa: string;
   imageURL: string;
+  tipo: string;
+  orden_grafica: number;
+  orden_procesador: number;
+  orden_ram: number;
 }
 
 export const BusquedaSoftware: React.FC = () => {
@@ -24,7 +28,8 @@ export const BusquedaSoftware: React.FC = () => {
         const res = await fetch("http://localhost:8080/v1/softwares");
         if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
         const data: Software[] = await res.json();
-        setSoftwares(data);
+        const filteredData = data.filter(software => software.tipo !== 'videojuego');
+        setSoftwares(filteredData);
       } catch (err: any) {
         setError(err.message || "Error al obtener listado de software");
         console.error(err);
