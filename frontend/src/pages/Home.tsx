@@ -13,7 +13,7 @@ const Home: FC = () => {
             to="/panel" 
             className="absolute top-4 right-4 z-20 bg-[#13a4ec] hover:bg-[#0d7ec1] text-white font-bold py-3 px-6 rounded-lg text-sm shadow-lg border-2 border-[#13a4ec] hover:border-white transition-all duration-300 hover:scale-105"
           >
-            🔧 Panel Admin
+            Panel Admin
           </Link>
           
           <div 
