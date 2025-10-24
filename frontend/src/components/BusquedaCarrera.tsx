@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useBusqueda } from  "../context/BusquedaContext";
 
 interface Carrera {
   id: string;
@@ -17,6 +18,9 @@ export const BusquedaCarrera: React.FC = () => {
   const filteredList = carreraList.filter(soft =>
     soft.nombre.toLowerCase().includes(query.toLowerCase())
   );
+
+  const { setBusqueda } = useBusqueda();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const obtenerListadoCarreraApi = async () => {
@@ -41,8 +45,8 @@ export const BusquedaCarrera: React.FC = () => {
 
   const handleAccion = (carrera: Carrera) => {
     setSelectedId(carrera.id);
-    // aca se puede llegar a llamar otra api futura
-    console.log("Botón clickeado:", carrera);
+    setBusqueda("carrera", carrera);
+    navigate("/recomendacion")
   };
 
   return (
@@ -100,7 +104,9 @@ export const BusquedaCarrera: React.FC = () => {
                   <h3 className="font-semibold text-white text-lg leading-tight">{carrera.nombre}</h3>
                 </div>
                 
-                <Link to="/recomendacion" className="w-full">
+                {/* <Link to="/recomendacion"
+                  className="w-full"
+                  state={{ carreraSeleccionada: carrera }}> */}
                   <button
                     onClick={() => handleAccion(carrera)}
                     className={`w-full py-2 px-4 rounded-lg font-medium transition-all ${
@@ -111,7 +117,7 @@ export const BusquedaCarrera: React.FC = () => {
                   >
                     Seleccionar
                   </button>
-                </Link>
+                {/* </Link> */}
               </div>
             ))
           ) : !loading && (
