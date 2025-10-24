@@ -17,19 +17,22 @@ const App: FC = () => {
   const location = useLocation();
 
   return (
-    <div className="app-surface min-h-screen bg-gray-100">
+    <div className="app-surface min-h-screen bg-[#101c22] flex flex-col" style={{ overscrollBehavior: 'none' }}>
 
       <Header />
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/busqueda-software" element={<BusquedaSoftwarePage />} />
-        <Route path="/busqueda-carrera" element={<BusquedaCarreraPage />} />
-        <Route path="/busqueda-juego" element={<BusquedaJuegoPage />} />
-        <Route path="/recomendacion" element={<RecomendacionPage />} />
-        <Route path="/panel" element={isStaffAuthenticated() ? <PanelDeAdmin /> : <Navigate to="/login" replace />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/busqueda-software" element={<BusquedaSoftwarePage />} />
+          <Route path="/busqueda-carrera" element={<BusquedaCarreraPage />} />
+          <Route path="/busqueda-juego" element={<BusquedaJuegoPage />} />
+          <Route path="/recomendacion" element={<RecomendacionPage />} />
+          <Route path="/panel" element={isStaffAuthenticated() ? <PanelDeAdmin /> : <Navigate to="/login" replace />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </main>
+      
       {location.pathname !== '/panel' && <Footer />}
     </div>
   )
