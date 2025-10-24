@@ -1,89 +1,141 @@
-import React, { useEffect, useState } from "react";
-import { useBusqueda } from "../context/BusquedaContext"; // ajusta la ruta
+import { useEffect, useState } from "react";
+import { useBusqueda } from "../context/BusquedaContext";
 import { useNavigate } from "react-router-dom";
 
-interface Carrera {
+export interface GenericItem {
   id: string;
   nombre: string;
-  imageURL: string;
+  tipo?: string;
+  empresa?: string;
+  image_url?: string;
+  orden_grafica?: number;
+  orden_procesador?: number;
+  orden_ram?: number;
+  fabricante?: string;
+  msrp?: number;
+  form_factor?: string;
+  max_largo_gpu_float?: number;
+  socket?: string;
+  consumo?: number;
+  generacion?: string;
+  nucleos?: number;
+  largo?: number;
+  modelo?: string;
+  vram?: number;
+  capacidad?: number;
+  tipo_almacenamiento?: string;
+  socket_procesador?: string;
+  socket_ram?: string;
+  precio?: number;
 }
 
-interface Recomendacion {
-  id: string;
-  nombre: string;
-  descripcion: string;
-  imageURL?: string;
-}
-
-export const RecomendacionPage: React.FC = () => {
-  const { tipo, datos } = useBusqueda(); // "carrera" y el objeto seleccionado
-  const [recomendaciones, setRecomendaciones] = useState<Recomendacion[]>([]);
+export const RecomendacionPage = () => {
+  const { tipo, datos } = useBusqueda();
+  const [items, setItems] = useState<GenericItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Si no hay datos, volvemos a la búsqueda
     if (!tipo || !datos) {
-      navigate("/busqueda-carrera"); // ruta por defecto
+      navigate("/busqueda-carrera");
       return;
     }
 
-    const fetchRecomendaciones = async () => {
+    const fetchItems = async () => {
       setLoading(true);
       try {
-        // Ejemplo: GET con id de carrera
-        const res = await fetch(`http://localhost:8080/v1/recomendaciones-carrera/${datos.id}`);
+        const res = await fetch(
+          `http://localhost:8080/v1/recomendaciones-carrera/${datos.id}`
+        );
         if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
-        const data: Recomendacion[] = await res.json();
-        setRecomendaciones(data);
+        const data: GenericItem[] = await res.json();
+        setItems(data);
       } catch (err: any) {
         setError(err.message || "Error al obtener recomendaciones");
-        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRecomendaciones();
+    fetchItems();
   }, [tipo, datos, navigate]);
 
-  if (!tipo || !datos) {
-    return <p>Redirigiendo a búsqueda...</p>;
-  }
+  // 🔹 Íconos reemplazados por emojis
+  const iconMap: Record<string, string> = {
+    Procesador: "🧠",
+    GPU: "🎮",
+    Disco: "💾",
+    RAM: "📦",
+    Motherboard: "🖥️",
+    PSU: "⚡",
+    Gabinete: "🧱",
+  };
 
   return (
-    <div className="min-h-screen bg-[#101c22] text-gray-300 font-['Space_Grotesk',sans-serif] py-8">
-      <div className="container mx-auto px-6 max-w-4xl">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">
-          Recomendaciones para: {(datos as Carrera).nombre}
-        </h2>
-
-        {loading && <p className="text-gray-400 text-center">Cargando recomendaciones...</p>}
-        {error && <p className="text-red-400 text-center">{error}</p>}
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {recomendaciones.map((r) => (
-            <div key={r.id} className="bg-[#1a2831] border border-gray-600 rounded-lg p-4">
-              {r.imageURL && (
-                <img
-                  src={r.imageURL}
-                  alt={r.nombre}
-                  className="w-full h-32 object-cover rounded-lg mb-4"
-                />
-              )}
-              <h3 className="font-semibold text-white text-lg">{r.nombre}</h3>
-              <p className="text-gray-400">{r.descripcion}</p>
-            </div>
-          ))}
+    <main className="min-h-screen bg-[#111827] text-gray-300 font-sans py-16">
+      <div className="max-w-4xl mx-auto px-6">
+        {/* Título principal */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-white">
+            Tu configuración de PC recomendada
+          </h2>
+          <p className="mt-4 text-lg text-gray-400">
+            Esta es la configuración óptima del PC
+para sus necesidades.
+          </p>
         </div>
 
-        {!loading && recomendaciones.length === 0 && (
-          <p className="text-gray-400 text-center mt-6">
-            No hay recomendaciones disponibles para esta carrera.
-          </p>
-        )}
+        {/* Tarjeta principal */}
+        <div className="bg-[#1f2937] rounded-2xl shadow-xl p-8 space-y-8">
+          {loading && (
+            <p className="text-center text-gray-400">Loading recommendations...</p>
+          )}
+          {error && <p className="text-center text-red-500">{error}</p>}
+
+          {/* Lista de componentes */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className="flex flex-col bg-[#111827]/60 rounded-xl p-5 hover:bg-[#111827]/80 transition"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-2xl">
+                    {iconMap[item.tipo || "Processor"] || "💻"}
+                  </span>
+                  <h3 className="text-lg font-semibold text-blue-400">
+                    {item.tipo || "Component"}
+                  </h3>
+                </div>
+                <p className="font-medium text-white">{item.nombre}</p>
+                <p className="text-sm text-gray-400 mt-1">
+                  {item.empresa ? `by ${item.empresa}` : "—"}
+                </p>
+                {item.precio && (
+                  <p className="text-sm text-gray-500 mt-1">Price: ${item.precio}</p>
+                )}
+              </div>
+            ))}
+
+            {!loading && items.length === 0 && !error && (
+              <p className="col-span-2 text-center text-gray-400">
+                No recommendations found.
+              </p>
+            )}
+          </div>
+
+          {/* Botones inferiores */}
+          <div className="flex flex-col sm:flex-row justify-center gap-4 pt-8 border-t border-gray-700">
+            <button className="bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-600 transition-all transform hover:scale-105 flex items-center gap-2 justify-center">
+              Save Recommendation
+            </button>
+            <button className="bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-gray-500 transition-all flex items-center gap-2 justify-center">
+              Print
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+    </main>
   );
 };
