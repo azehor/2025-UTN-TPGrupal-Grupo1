@@ -45,9 +45,22 @@ export const RecomendacionPage = () => {
     const fetchItems = async () => {
       setLoading(true);
       try {
-        const res = await fetch(
-          `http://localhost:8080/v1/recomendaciones-carrera/${datos.id}`
-        );
+        let res: Response;
+
+        if (tipo === "carrera") {
+          res = await fetch(`http://localhost:8080/v1/recomendaciones-carrera/${datos.id}`);
+        } else if (tipo === "software") {
+          res = await fetch(`http://localhost:8080/v1/recomendaciones-softwares`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ids: datos.ids as string[] }),
+          });
+
+        
+        } else {
+          throw new Error("Tipo de búsqueda no soportado");
+        }
+
         if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
         const data: GenericItem[] = await res.json();
         setItems(data);
