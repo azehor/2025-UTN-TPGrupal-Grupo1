@@ -18,46 +18,47 @@ type Config struct {
 
 // LoadConfig carga la configuración desde variables de entorno o .env en desarrollo
 func LoadConfig() (*Config, error) {
-	// Detectar entorno: APP_ENV (preferida) o GO_ENV; default: development
+
 	env := os.Getenv("APP_ENV")
-	if env == "" {
-		env = os.Getenv("GO_ENV")
-	}
+
 	if env == "" {
 		env = "development"
 	}
 	envLower := strings.ToLower(env)
 
-	// Solo cargamos .env en desarrollo/local
-	if envLower == "development" || envLower == "dev" || envLower == "local" {
+	// Solo cargamos .env en desarrollo
+	if envLower == "development" {
 		_ = godotenv.Load() // ignoramos error, usamos variables del sistema si no existe
 	}
 
-	// Host
 	host := os.Getenv("APP_HOST")
 	if host == "" {
 		host = "0.0.0.0"
 	}
 
-	// Port (soportar APP_PORT y PORT)
 	portStr := os.Getenv("APP_PORT")
+
 	if portStr == "" {
-		portStr = os.Getenv("PORT")
-	}
-	port := 8080 // default
-	if portStr != "" {
-		p, err := strconv.Atoi(portStr)
-		if err != nil {
-			return nil, fmt.Errorf("invalid APP_PORT: %v", err)
+		if envLower == "production" {
+			return nil, fmt.Errorf("APP_PORT is required in production")
+
 		}
-		port = p
-	} else if envLower == "production" || envLower == "prod" {
-		return nil, fmt.Errorf("APP_PORT is required in production")
+		// default en development.
+		return &Config{
+			Env:  envLower,
+			Host: host,
+			Port: 8080}, nil
+	}
+
+	// Parsear puerto
+	p, err := strconv.Atoi(portStr)
+	if err != nil {
+		return nil, fmt.Errorf("invalid APP_PORT: %v", err)
 	}
 
 	return &Config{
 		Env:  envLower,
 		Host: host,
-		Port: port,
+		Port: p,
 	}, nil
 }
