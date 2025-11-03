@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useBusqueda } from "../context/BusquedaContext";
+import { getApiBase } from "../lib/env";
 
 interface Software {
   id: string;
@@ -30,7 +31,9 @@ export const BusquedaSoftware: React.FC = () => {
   useEffect(() => {
     const fetchSoftwares = async () => {
       try {
-        const res = await fetch("http://localhost:8080/v1/softwares");
+        const base = getApiBase();
+        const url = `${base.replace(/\/+$/, '')}/softwares`;
+        const res = await fetch(url);
         if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
         const data: Software[] = await res.json();
         const filteredData = data.filter(software => software.tipo !== 'videojuego');

@@ -49,7 +49,7 @@ import (
 	"github.com/go-chi/docgen"
 )
 
-func Start(port string) {
+func Start(addr string) error {
 	r := chi.NewRouter()
 
 	r.Use(middleware.ContentTypeMiddleware)
@@ -112,7 +112,7 @@ func Start(port string) {
 		_ = os.WriteFile("docs/routes.md", []byte(md), 0o644)
 
 		fmt.Println("Documentacion generada en docs/routes.md")
-		return
+		return nil
 	}
 
 	c := make(chan os.Signal, 1)
@@ -123,9 +123,11 @@ func Start(port string) {
 		os.Exit(1)
 	}()
 
-	fmt.Printf("Running server on port: %v", port)
-	http.ListenAndServe(port, r)
+	fmt.Printf("Running server on %s\n", addr)
+	// Start HTTP server and return any error to the caller
+	err := http.ListenAndServe(addr, r)
 	shutdown()
+	return err
 }
 
 func shutdown() {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useBusqueda } from  "../context/BusquedaContext";
+import { getApiBase } from "../lib/env";
 
 interface Carrera {
   id: string;
@@ -26,7 +27,9 @@ export const BusquedaCarrera: React.FC = () => {
     const obtenerListadoCarreraApi = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:8080/v1/carreras"); // Endpoint de api en go local, ver luego en .env de manejar estas urls
+        const base = getApiBase();
+        const url = `${base.replace(/\/+$/, '')}/carreras`;
+        const res = await fetch(url); // URL tomada de config (runtime/build) sin hardcodear
         if (!res.ok) {
           throw new Error(`Error HTTP: ${res.status}`);
         }
