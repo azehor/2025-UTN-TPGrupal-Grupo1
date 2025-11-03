@@ -11,7 +11,7 @@ export function getApiBase(): string {
     // ignore
   }
 
-  const build = (import.meta as any).env?.VITE_API_BASE_URL;
+  const build = import.meta.env.VITE_API_BASE_URL;
   if (build && typeof build === 'string' && build.length) return build;
 
   if (typeof window !== 'undefined' && window.location) {
