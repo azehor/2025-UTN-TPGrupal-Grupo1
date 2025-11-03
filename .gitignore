@@ -1,1 +1,12 @@
 *.exe
+
+# Environment files (do not commit secrets)
+.env
+api/.env
+
+# Frontend build artifacts
+frontend/node_modules/
+frontend/dist/
+
+# Go build artifacts
+api/quepc

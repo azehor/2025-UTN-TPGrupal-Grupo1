@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# Vite environment files (keep locals uncommitted)
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+# Optional: if you prefer not to track production env files at all
+.env.production
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

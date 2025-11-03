@@ -1,5 +1,8 @@
 // Servicio para interactuar con la API del backend
-const API_BASE_URL = 'http://localhost:8080/v1';
+// Lee la URL base desde variables de entorno de Vite (prefijo VITE_),
+// con fallback a misma origin + "/v1". En desarrollo configurar en .env.development.
+import { getApiBase } from './env';
+const API_BASE_URL = getApiBase();
 
 export type EntityType =
   | "software"
