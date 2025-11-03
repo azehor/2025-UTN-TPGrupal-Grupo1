@@ -8,5 +8,6 @@ api/.env
 frontend/node_modules/
 frontend/dist/
 
-# Go build artifacts
-api/quepc
+secrets/
+.vscode/
+db_data/
