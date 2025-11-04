@@ -1,3 +1,21 @@
+# Ignore local environment files (keep only the examples in git)
+.env*
+!.env.development.example
+!.env.development.secrets.example
+!.env.production.example
+!.env.production.secrets.example
+
+# Node and Vite artifacts
+frontend/node_modules/
+frontend/dist/
+
+# Go build cache directories
+api/tmp/
+
+# Editor/OS
+.DS_Store
+*.swp
+.vscode/*.exe
 *.exe
 
 # Environment files (do not commit secrets)
@@ -11,3 +29,7 @@ frontend/dist/
 secrets/
 .vscode/
 db_data/
+
+api/tmp
+api/bin
+api/.air

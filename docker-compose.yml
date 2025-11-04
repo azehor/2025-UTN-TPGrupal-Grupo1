@@ -9,7 +9,7 @@ services:
       - --accesslog=true
       - --log.level=INFO
     ports:
-      - "8081:8080"
+      - "${TRAEFIK_PORT:-8080}:8080"
     volumes:
       - ${XDG_RUNTIME_DIR}/docker.sock:/var/run/docker.sock:ro
     networks:
@@ -18,10 +18,9 @@ services:
 
   db:
     image: postgres:18.0-alpine3.22
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_DB: db_nahue
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    env_file:
+      - .env.production
+      - .env.production.secrets
     secrets:
       - db_password
     volumes:
@@ -38,16 +37,9 @@ services:
     build:
       context: .
       dockerfile: api/Dockerfile
-    environment:
-      APP_ENV: production
-      APP_HOST: 0.0.0.0
-      APP_PORT: 8080
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_NAME: db_nahue
-      DB_SSLMODE: disable
-      DB_PASSWORD_FILE: /run/secrets/db_password
+    env_file:
+      - .env.production
+      - .env.production.secrets
     secrets:
       - db_password
     depends_on:
@@ -69,7 +61,7 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
       args:
-        VITE_API_BASE_URL: /v1
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/v1}
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
