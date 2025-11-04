@@ -1,5 +1,5 @@
 #!/bin/bash
-FILE="./db_data/bd_nahue_v2.sql"
+FILE="../db_data/bd_nahue_v2.sql"
 CONTAINER="2025-utn-tpgrupal-grupo1-db-1"
 DBUSER="postgres"
 DBNAME="db_nahue"
