@@ -25,6 +25,7 @@ import (
 	//imports de componentes
 	"quepc/api/internal/componentes"
 
+	"quepc/api/internal/auth"
 	"quepc/api/internal/componentes/discos"
 	"quepc/api/internal/componentes/gabinetes"
 	"quepc/api/internal/componentes/gpus"
@@ -98,11 +99,14 @@ func Start(addr string) error {
 
 	recomendaciones := recomendaciones.New(softwaresStore, csStoreInst, gpusStore, procesadoresStore, ramsStore, discosStore, gabinetesStore, motherboardsStore, psusStore)
 
+	authHandler := auth.NewHandler(dbPostgresql.DB)
+
 	httpServer := transport.New(carreras,
 		softwares,
 		recomendaciones,
 		carreraSoftwares,
-		componentes)
+		componentes,
+		authHandler)
 	httpServer.AddRoutes(r)
 
 	// Se busca la variable de entorno y en base a eso se genera o no la documentacion
@@ -115,6 +119,10 @@ func Start(addr string) error {
 		return nil
 	}
 
+	if err := auth.CrearSuperAdmin(dbPostgresql.DB); err != nil {
+		return fmt.Errorf("error creando superadmin: %w", err)
+	}
+
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
@@ -124,7 +132,6 @@ func Start(addr string) error {
 	}()
 
 	fmt.Printf("Running server on %s\n", addr)
-	// Start HTTP server and return any error to the caller
 	err := http.ListenAndServe(addr, r)
 	shutdown()
 	return err

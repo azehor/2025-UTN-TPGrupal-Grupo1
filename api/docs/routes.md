@@ -17,6 +17,42 @@
 
 </details>
 <details>
+<summary>`/v1/admin/users`</summary>
+
+- [ContentTypeMiddleware]()
+- [o-chi/cors.(*Cors).Handler-fm]()
+- **/v1**
+	- **/admin**
+		- [AdminOnly]()
+		- **/users**
+			- _POST_
+				- [pi/internal/auth.(*Handler).AdminCreateUser-fm]()
+
+</details>
+<details>
+<summary>`/v1/auth/login`</summary>
+
+- [ContentTypeMiddleware]()
+- [o-chi/cors.(*Cors).Handler-fm]()
+- **/v1**
+	- **/auth/login**
+		- _POST_
+			- [pi/internal/auth.(*Handler).Login-fm]()
+
+</details>
+<details>
+<summary>`/v1/auth/me`</summary>
+
+- [ContentTypeMiddleware]()
+- [o-chi/cors.(*Cors).Handler-fm]()
+- **/v1**
+	- **/auth/me**
+		- _GET_
+			- [AuthMiddleware]()
+			- [pi/internal/auth.(*Handler).Me-fm]()
+
+</details>
+<details>
 <summary>`/v1/carreras`</summary>
 
 - [ContentTypeMiddleware]()
@@ -26,6 +62,7 @@
 		- _GET_
 			- [pi/internal/carreras.(*Carreras).List-fm]()
 		- _POST_
+			- [AuthMiddleware]()
 			- [pi/internal/carreras.(*Carreras).Create-fm]()
 
 </details>
@@ -36,12 +73,15 @@
 - [o-chi/cors.(*Cors).Handler-fm]()
 - **/v1**
 	- **/carreras/{id}**
-		- _DELETE_
-			- [pi/internal/carreras.(*Carreras).Delete-fm]()
 		- _GET_
+			- [AuthMiddleware]()
 			- [pi/internal/carreras.(*Carreras).Read-fm]()
 		- _PUT_
+			- [AuthMiddleware]()
 			- [pi/internal/carreras.(*Carreras).Update-fm]()
+		- _DELETE_
+			- [AuthMiddleware]()
+			- [pi/internal/carreras.(*Carreras).Delete-fm]()
 
 </details>
 <details>
@@ -63,8 +103,10 @@
 - **/v1**
 	- **/carreras/{id}/softwares/{software_id}**
 		- _POST_
+			- [AuthMiddleware]()
 			- [pi/internal/carreraSoftware.(*CarreraSoftwares).Create-fm]()
 		- _DELETE_
+			- [AuthMiddleware]()
 			- [pi/internal/carreraSoftware.(*CarreraSoftwares).Delete-fm]()
 
 </details>
@@ -79,6 +121,7 @@
 			- _GET_
 				- [pi/internal/componentes/discos.(*Discos).List-fm]()
 			- _POST_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/discos.(*Discos).Create-fm]()
 
 </details>
@@ -90,12 +133,15 @@
 - **/v1**
 	- **/componentes**
 		- **/discos/{id}**
-			- _DELETE_
-				- [pi/internal/componentes/discos.(*Discos).Delete-fm]()
 			- _GET_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/discos.(*Discos).Read-fm]()
 			- _PUT_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/discos.(*Discos).Update-fm]()
+			- _DELETE_
+				- [AuthMiddleware]()
+				- [pi/internal/componentes/discos.(*Discos).Delete-fm]()
 
 </details>
 <details>
@@ -109,6 +155,7 @@
 			- _GET_
 				- [pi/internal/componentes/gabinetes.(*Gabinetes).List-fm]()
 			- _POST_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/gabinetes.(*Gabinetes).Create-fm]()
 
 </details>
@@ -120,12 +167,15 @@
 - **/v1**
 	- **/componentes**
 		- **/gabinetes/{id}**
-			- _DELETE_
-				- [pi/internal/componentes/gabinetes.(*Gabinetes).Delete-fm]()
 			- _GET_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/gabinetes.(*Gabinetes).Read-fm]()
 			- _PUT_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/gabinetes.(*Gabinetes).Update-fm]()
+			- _DELETE_
+				- [AuthMiddleware]()
+				- [pi/internal/componentes/gabinetes.(*Gabinetes).Delete-fm]()
 
 </details>
 <details>
@@ -139,6 +189,7 @@
 			- _GET_
 				- [pi/internal/componentes/gpus.(*GPUs).List-fm]()
 			- _POST_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/gpus.(*GPUs).Create-fm]()
 
 </details>
@@ -151,10 +202,13 @@
 	- **/componentes**
 		- **/gpus/{id}**
 			- _GET_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/gpus.(*GPUs).Read-fm]()
 			- _PUT_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/gpus.(*GPUs).Update-fm]()
 			- _DELETE_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/gpus.(*GPUs).Delete-fm]()
 
 </details>
@@ -169,6 +223,7 @@
 			- _GET_
 				- [pi/internal/componentes/motherboards.(*Motherboards).List-fm]()
 			- _POST_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/motherboards.(*Motherboards).Create-fm]()
 
 </details>
@@ -180,12 +235,15 @@
 - **/v1**
 	- **/componentes**
 		- **/motherboards/{id}**
+			- _GET_
+				- [AuthMiddleware]()
+				- [pi/internal/componentes/motherboards.(*Motherboards).Read-fm]()
 			- _PUT_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/motherboards.(*Motherboards).Update-fm]()
 			- _DELETE_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/motherboards.(*Motherboards).Delete-fm]()
-			- _GET_
-				- [pi/internal/componentes/motherboards.(*Motherboards).Read-fm]()
 
 </details>
 <details>
@@ -199,6 +257,7 @@
 			- _GET_
 				- [pi/internal/componentes/procesadores.(*Procesadores).List-fm]()
 			- _POST_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/procesadores.(*Procesadores).Create-fm]()
 
 </details>
@@ -211,10 +270,13 @@
 	- **/componentes**
 		- **/procesadores/{id}**
 			- _PUT_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/procesadores.(*Procesadores).Update-fm]()
 			- _DELETE_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/procesadores.(*Procesadores).Delete-fm]()
 			- _GET_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/procesadores.(*Procesadores).Read-fm]()
 
 </details>
@@ -226,10 +288,11 @@
 - **/v1**
 	- **/componentes**
 		- **/psus**
+			- _POST_
+				- [AuthMiddleware]()
+				- [pi/internal/componentes/psus.(*PSUs).Create-fm]()
 			- _GET_
 				- [pi/internal/componentes/psus.(*PSUs).List-fm]()
-			- _POST_
-				- [pi/internal/componentes/psus.(*PSUs).Create-fm]()
 
 </details>
 <details>
@@ -241,10 +304,13 @@
 	- **/componentes**
 		- **/psus/{id}**
 			- _DELETE_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/psus.(*PSUs).Delete-fm]()
 			- _GET_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/psus.(*PSUs).Read-fm]()
 			- _PUT_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/psus.(*PSUs).Update-fm]()
 
 </details>
@@ -256,10 +322,11 @@
 - **/v1**
 	- **/componentes**
 		- **/rams**
+			- _POST_
+				- [AuthMiddleware]()
+				- [pi/internal/componentes/rams.(*RAMs).Create-fm]()
 			- _GET_
 				- [pi/internal/componentes/rams.(*RAMs).List-fm]()
-			- _POST_
-				- [pi/internal/componentes/rams.(*RAMs).Create-fm]()
 
 </details>
 <details>
@@ -271,10 +338,13 @@
 	- **/componentes**
 		- **/rams/{id}**
 			- _PUT_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/rams.(*RAMs).Update-fm]()
 			- _DELETE_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/rams.(*RAMs).Delete-fm]()
 			- _GET_
+				- [AuthMiddleware]()
 				- [pi/internal/componentes/rams.(*RAMs).Read-fm]()
 
 </details>
@@ -307,10 +377,11 @@
 - [o-chi/cors.(*Cors).Handler-fm]()
 - **/v1**
 	- **/softwares**
+		- _POST_
+			- [AuthMiddleware]()
+			- [pi/internal/softwares.(*Softwares).Create-fm]()
 		- _GET_
 			- [pi/internal/softwares.(*Softwares).List-fm]()
-		- _POST_
-			- [pi/internal/softwares.(*Softwares).Create-fm]()
 
 </details>
 <details>
@@ -320,13 +391,16 @@
 - [o-chi/cors.(*Cors).Handler-fm]()
 - **/v1**
 	- **/softwares/{id}**
+		- _DELETE_
+			- [AuthMiddleware]()
+			- [pi/internal/softwares.(*Softwares).Delete-fm]()
 		- _GET_
+			- [AuthMiddleware]()
 			- [pi/internal/softwares.(*Softwares).Read-fm]()
 		- _PUT_
+			- [AuthMiddleware]()
 			- [pi/internal/softwares.(*Softwares).Update-fm]()
-		- _DELETE_
-			- [pi/internal/softwares.(*Softwares).Delete-fm]()
 
 </details>
 
-Total # of routes: 23
+Total # of routes: 26
