@@ -18,6 +18,7 @@ import (
 	psusModel "quepc/api/internal/componentes/psus/model"
 	ramsModel "quepc/api/internal/componentes/rams/model"
 	softwaresModel "quepc/api/internal/softwares/model"
+	userModel "quepc/api/internal/user/model"
 )
 
 var DB *gorm.DB
@@ -49,7 +50,8 @@ func InitDB() {
 		&motherboardsModel.Motherboard{},
 		&procesadoresModel.Procesador{},
 		&psusModel.PSU{},
-		&ramsModel.RAM{}); err != nil {
+		&ramsModel.RAM{},
+		&userModel.User{}); err != nil {
 		log.Fatalf("Error al migrar tablas: %v", err)
 	}
 	DB = db
