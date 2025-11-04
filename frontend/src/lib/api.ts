@@ -2,6 +2,7 @@
 // Lee la URL base desde variables de entorno de Vite (prefijo VITE_),
 // con fallback a misma origin + "/v1". En desarrollo configurar en .env.development.
 import { getApiBase } from './env';
+import { getToken } from './auth';
 const API_BASE_URL = getApiBase();
 
 export type EntityType =
@@ -79,12 +80,17 @@ class ApiService {
   ): Promise<T> {
     const url = `${API_BASE_URL}/${endpoint}`;
     
+    const headers = new Headers(options.headers || {})
+    headers.set('Content-Type', 'application/json')
+    const token = getToken()
+    if (token) headers.set('Authorization', `Bearer ${token}`)
+
     const config: RequestInit = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
       ...options,
+      headers,
+      // We use Bearer tokens, not cookies; avoid forcing credentials to prevent CORS rejections
+      // (server currently has AllowCredentials=false). Let callers opt-in if needed.
+      credentials: options.credentials,
     };
 
     const response = await fetch(url, config);

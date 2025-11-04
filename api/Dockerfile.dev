@@ -1,0 +1,26 @@
+# Go API dev image with Air (live reload)
+FROM golang:1.25-alpine
+
+WORKDIR /app
+
+# Solo variables técnicas; las de app vienen de .env vía compose
+ENV PATH="/go/bin:/usr/local/go/bin:${PATH}" \
+    GO111MODULE=on \
+    CGO_ENABLED=1
+
+RUN apk add --no-cache git bash build-base
+
+# Acelera descargas de módulos
+COPY api/go.mod api/go.sum ./
+RUN go mod download
+
+# Air para live reload
+RUN go install github.com/air-verse/air@latest
+
+EXPOSE 8080
+
+# Copia de respaldo; en runtime se montará ./api:/app
+COPY api/ .
+
+# Ejecuta Air con la config del repo
+CMD ["air", "-c", ".air.toml"]

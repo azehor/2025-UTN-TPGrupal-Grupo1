@@ -1,0 +1,67 @@
+services:
+  db:
+    image: postgres:18.0-alpine3.22
+    env_file:
+      - .env.development
+      - .env.development.secrets
+    secrets:
+      - db_password
+    volumes:
+      - db_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db_nahue"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    # Optional: expose 5432 for local DB clients
+    ports:
+      - "5432:5432"
+
+  api-dev:
+    build:
+      context: .
+      dockerfile: api/Dockerfile.dev
+    env_file:
+      - .env.development
+      - .env.development.secrets
+    secrets:
+      - db_password
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./api:/app
+      - api_go_pkg:/go/pkg/mod
+      - api_air_tmp:/app/tmp
+    ports:
+      - "8080:8080"
+
+  web-dev:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile.dev
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080/v1}
+    env_file:
+      - .env.development
+      - .env.development.secrets
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "100"
+    depends_on:
+      - api-dev
+    volumes:
+      - ./frontend:/app
+      - web_node_modules:/app/node_modules
+    ports:
+      - "5173:5173"
+
+volumes:
+  db_data_dev:
+  api_go_pkg:
+  api_air_tmp:
+  web_node_modules:
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt

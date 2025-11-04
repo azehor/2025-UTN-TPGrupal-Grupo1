@@ -8,4 +8,21 @@ export default defineConfig({
     react(), 
     tailwindcss(),
   ],
+  server: {
+    // Bind to all interfaces inside the container
+    host: true,
+    port: 5173,
+    strictPort: true,
+    // Ensure HMR websocket points to host:5173 when accessed from the browser on the host
+    hmr: {
+      host: 'localhost',
+      clientPort: 5173,
+      protocol: 'ws',
+    },
+    // On Windows + Docker bind mounts, file system events often don't propagate; use polling
+    watch: {
+      usePolling: true,
+      interval: 100,
+    },
+  },
 })

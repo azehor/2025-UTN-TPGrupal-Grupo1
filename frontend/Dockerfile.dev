@@ -1,0 +1,17 @@
+# Vite dev server with HMR
+FROM node:20-alpine
+WORKDIR /app
+
+ARG VITE_API_BASE_URL=/v1
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+
+# Install deps (kept even if we bind-mount; node_modules irá a un volumen)
+COPY frontend/package*.json ./
+RUN npm ci
+
+# Fallback copy (compose montará ./frontend:/app)
+COPY frontend/ .
+
+EXPOSE 5173
+
+CMD ["sh", "-lc", "if [ ! -d node_modules ]; then npm ci; fi; npm run dev -- --host 0.0.0.0 --port 5173"]

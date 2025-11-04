@@ -1,0 +1,87 @@
+services:
+  traefik:
+    image: traefik:v3.1
+    command:
+      - --providers.docker=true
+      - --providers.docker.endpoint=unix:///var/run/docker.sock
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:8080
+      - --accesslog=true
+      - --log.level=INFO
+    ports:
+      - "${TRAEFIK_PORT:-8080}:8080"
+    volumes:
+      - ${XDG_RUNTIME_DIR}/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - proxy
+    restart: unless-stopped
+
+  db:
+    image: postgres:18.0-alpine3.22
+    env_file:
+      - .env.production
+      - .env.production.secrets
+    secrets:
+      - db_password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db_nahue"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - proxy
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    env_file:
+      - .env.production
+      - .env.production.secrets
+    secrets:
+      - db_password
+    depends_on:
+      db:
+        condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.api.rule=PathPrefix(`/v1`)
+      - traefik.http.routers.api.entrypoints=web
+      - traefik.http.routers.api.priority=2
+      - traefik.http.services.api.loadbalancer.server.port=8080
+    networks:
+      - proxy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/v1}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.web.rule=PathPrefix(`/`) && !PathPrefix(`/v1`)
+      - traefik.http.routers.web.entrypoints=web
+      - traefik.http.routers.web.priority=1
+      - traefik.http.services.web.loadbalancer.server.port=80
+    depends_on:
+      - api
+    networks:
+      - proxy
+    restart: unless-stopped
+
+volumes:
+  db_data:
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+
+networks:
+  proxy:
+    name: proxy

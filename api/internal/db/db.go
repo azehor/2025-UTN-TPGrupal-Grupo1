@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -27,6 +28,15 @@ func InitDB() {
 	// Leer variables del entorno
 	user := os.Getenv("DB_USER")
 	pass := os.Getenv("DB_PASSWORD")
+	if pass == "" {
+		if pf := os.Getenv("DB_PASSWORD_FILE"); pf != "" {
+			if b, err := os.ReadFile(pf); err == nil {
+				pass = strings.TrimSpace(string(b))
+			} else {
+				log.Fatalf("No se pudo leer DB_PASSWORD_FILE: %v", err)
+			}
+		}
+	}
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	name := os.Getenv("DB_NAME")
