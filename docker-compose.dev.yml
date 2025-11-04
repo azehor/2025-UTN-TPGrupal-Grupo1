@@ -45,6 +45,9 @@ services:
     env_file:
       - .env.development
       - .env.development.secrets
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "100"
     depends_on:
       - api-dev
     volumes:
