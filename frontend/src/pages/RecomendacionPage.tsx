@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useBusqueda } from "../context/BusquedaContext";
 import { useNavigate } from "react-router-dom";
+import getApiBase from "../lib/env";
 
 export interface GenericItem {
   id: string;
@@ -46,11 +47,12 @@ export const RecomendacionPage = () => {
       setLoading(true);
       try {
         let res: Response;
+        const API_BASE = getApiBase();
 
         if (tipo === "carrera") {
-          res = await fetch(`http://localhost:8080/v1/recomendaciones-carrera/${datos.id}`);
+          res = await fetch(`${API_BASE}/recomendaciones-carrera/${datos.id}`);
         } else if (tipo === "software") {
-          res = await fetch(`http://localhost:8080/v1/recomendaciones-softwares`, {
+          res = await fetch(`${API_BASE}/recomendaciones-softwares`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ ids: datos.ids as string[] }),
