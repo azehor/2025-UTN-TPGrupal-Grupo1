@@ -1,6 +1,7 @@
 import type { FC } from "react";
-import { Link } from 'react-router-dom'
-import fondoProyecto from '../assets/fondo proyecto.avif'
+import { Link } from 'react-router-dom';
+import fondoProyecto from '../assets/fondo proyecto.avif';
+import { GraduationCap, Gamepad2, Cpu } from "lucide-react";
 
 const Home: FC = () => {
   return (
@@ -25,10 +26,10 @@ const Home: FC = () => {
           
           <div className="container mx-auto px-6 text-center relative z-10">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-              Encuentra la PC perfecta para tus estudios
+              Encuentra la PC ideal para tus necesidades académicas, profesionales o de ocio 
             </h1>
             <p className="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto mb-8">
-              Ya seas un estudiante de diseño que necesita una estación de trabajo potente o un estudiante de literatura que busca una laptop confiable, tenemos lo que necesitas. Explora nuestras recomendaciones adaptadas a tus necesidades específicas.
+              QuePC analiza tus requerimientos, valida las opciones del mercado y selecciona los componentes adecuados para recomendarte la mejor opción y ayudarte a rendir al máximo
             </p>
           </div>
         </section>
@@ -37,50 +38,64 @@ const Home: FC = () => {
         <section className="py-16 bg-[#101c22]">
           <div className="container mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-              <div className="bg-[#1a2831] p-8 rounded-xl shadow-sm hover:shadow-lg hover:shadow-[#13a4ec]/20 transition-all duration-300 border border-transparent hover:border-[#13a4ec]/30">
+
+              {/* === Por Carrera === */}
+              <Link 
+                to="/busqueda-carrera"
+                className="block bg-[#1a2831] p-8 rounded-xl shadow-sm hover:shadow-lg hover:shadow-[#13a4ec]/20 transition-all duration-300 border border-transparent hover:border-[#13a4ec]/30 hover:scale-[1.02]"
+              >
+                <div className="flex justify-center mb-4 text-[#13a4ec]">
+                  <GraduationCap size={48} strokeWidth={1.5} />
+                </div>
                 <h3 className="text-2xl font-bold text-white mb-2">Por Carrera</h3>
                 <p className="text-gray-400 mb-4">
-                  Recomendaciones basadas en las demandas de tu programa académico.
+                  Recomendaciones basadas en las demandas de tus programas académicos
                 </p>
-                <Link 
-                  to="/busqueda-carrera"
-                  className="text-[#13a4ec] font-bold hover:underline"
-                >
+                <span className="text-[#13a4ec] font-bold hover:underline">
                   Explorar Carreras
-                </Link>
-              </div>
-              
-              <div className="bg-[#1a2831] p-8 rounded-xl shadow-sm hover:shadow-lg hover:shadow-[#13a4ec]/20 transition-all duration-300 border border-transparent hover:border-[#13a4ec]/30">
+                </span>
+              </Link>
+
+              {/* === Por Juego === */}
+              <Link 
+                to="/busqueda-juego"
+                className="block bg-[#1a2831] p-8 rounded-xl shadow-sm hover:shadow-lg hover:shadow-[#13a4ec]/20 transition-all duration-300 border border-transparent hover:border-[#13a4ec]/30 hover:scale-[1.02]"
+              >
+                <div className="flex justify-center mb-4 text-[#13a4ec]">
+                  <Gamepad2 size={48} strokeWidth={1.5} />
+                </div>                
                 <h3 className="text-2xl font-bold text-white mb-2">Por Juego</h3>
                 <p className="text-gray-400 mb-4">
-                  Encuentra una PC que pueda manejar tus juegos favoritos después de clases.
+                  Encuentra una PC que pueda manejar tus juegos favoritos después de clases
                 </p>
-                <Link 
-                  to="/busqueda-juego"
-                  className="text-[#13a4ec] font-bold hover:underline"
-                >
+                <span className="text-[#13a4ec] font-bold hover:underline">
                   Explorar Juegos
-                </Link>
-              </div>
-              
-              <div className="bg-[#1a2831] p-8 rounded-xl shadow-sm hover:shadow-lg hover:shadow-[#13a4ec]/20 transition-all duration-300 border border-transparent hover:border-[#13a4ec]/30">
+                </span>
+              </Link>
+
+              {/* === Por Software === */}
+              <Link 
+                to="/busqueda-software"
+                className="block bg-[#1a2831] p-8 rounded-xl shadow-sm hover:shadow-lg hover:shadow-[#13a4ec]/20 transition-all duration-300 border border-transparent hover:border-[#13a4ec]/30 hover:scale-[1.02]"
+              >
+                <div className="flex justify-center mb-4 text-[#13a4ec]">
+                  <Cpu size={48} strokeWidth={1.5} />
+                </div>               
                 <h3 className="text-2xl font-bold text-white mb-2">Por Software</h3>
                 <p className="text-gray-400 mb-4">
-                  Asegúrate de que tu máquina ejecute el software específico que necesitas.
+                  Asegúrate de que tu máquina ejecute el software específico que necesitas
                 </p>
-                <Link 
-                  to="/busqueda-software"
-                  className="text-[#13a4ec] font-bold hover:underline"
-                >
+                <span className="text-[#13a4ec] font-bold hover:underline">
                   Explorar Software
-                </Link>
-              </div>
+                </span>
+              </Link>
+
             </div>
           </div>
         </section>
       </main>
     </div>
-  )
-} 
+  );
+};
 
-export default Home
+export default Home;
