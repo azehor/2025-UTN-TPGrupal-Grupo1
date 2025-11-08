@@ -3,11 +3,14 @@ package http
 import (
 	"log/slog"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"quepc/api/internal/auth"
 	carrerasoftware "quepc/api/internal/carreraSoftware"
 	"quepc/api/internal/carreras"
 	"quepc/api/internal/componentes"
+	"quepc/api/internal/middleware"
 	"quepc/api/internal/recomendaciones"
 	"quepc/api/internal/softwares"
 
@@ -46,7 +49,12 @@ func New(c *carreras.Carreras,
 func (s *Server) AddRoutes(r *chi.Mux) {
 	r.Get("/", s.getHomepage)
 
+	workdir, _ := os.Getwd()
+	imgDir := http.Dir(filepath.Join(workdir, "static/images"))
+	FileServer(r, "/static/images", imgDir)
+
 	r.Route("/v1", func(r chi.Router) {
+		r.Use(middleware.ContentTypeMiddleware)
 
 		// PÚBLICAS
 		// AUTH

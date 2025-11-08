@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"quepc/api/internal/componentes/gpus/model"
+	"quepc/api/utils"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -44,6 +45,10 @@ func (g *GPUs) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	for _, gpp := range gp {
+		gpp.ImageURL = utils.CompletarImageURL(r.Host, gpp.ImageURL)
+	}
+
 	if err := json.NewEncoder(w).Encode(gp.ToDto()); err != nil {
 		slog.Error("Error al codificar gpus a JSON", "error", err)
 		http.Error(w, `{"error":"Error interno al generar la respuesta"}`, http.StatusInternalServerError)
@@ -53,8 +58,9 @@ func (g *GPUs) List(w http.ResponseWriter, r *http.Request) {
 
 func (g *GPUs) Create(w http.ResponseWriter, r *http.Request) {
 	var dto model.DTO
+	r.ParseMultipartForm(10 << 20) //Limite de payload 10MB
 
-	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+	if err := json.NewDecoder(strings.NewReader(r.FormValue("data"))).Decode(&dto); err != nil {
 		slog.Error("Error al decodificar body en Create", "error", err)
 		http.Error(w, `{"error":"JSON invalido o vacio"}`, http.StatusBadRequest)
 		return
@@ -67,6 +73,20 @@ func (g *GPUs) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Parseo y guardado de Imagen
+	file, handle, err := r.FormFile("imagen")
+	if err != nil {
+		slog.Error("Error al leer imagen del request en Create", "error", err)
+		http.Error(w, `{"error":"Campo 'imagen' invalido o vacio"}`, http.StatusBadRequest)
+		return
+	}
+	dto.ImageURL, err = utils.GuardarImagen(file, handle, "gpus")
+	if err != nil {
+		slog.Error("Error al guardar imagen del request en Create", "error", err)
+		http.Error(w, `{"error":"No se pudo crear el disco"}`, http.StatusInternalServerError)
+		return
+	}
+
 	gp := dto.ToModel()
 
 	created, err := g.store.Create(gp)
@@ -76,6 +96,7 @@ func (g *GPUs) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	created.ImageURL = utils.CompletarImageURL(r.Host, created.ImageURL)
 	w.WriteHeader(http.StatusCreated)
 
 	if err := json.NewEncoder(w).Encode(created.ToDto()); err != nil {
@@ -106,6 +127,7 @@ func (g *GPUs) Read(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	gp.ImageURL = utils.CompletarImageURL(r.Host, gp.ImageURL)
 	if err := json.NewEncoder(w).Encode(gp.ToDto()); err != nil {
 		slog.Error("Error al codificar la gpu leida", "error", err)
 		http.Error(w, `{"error":"Error interno al generar la respuesta"}`, http.StatusInternalServerError)
@@ -119,12 +141,24 @@ func (g *GPUs) Update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"ID invalido"}`, http.StatusBadRequest)
 		return
 	}
+	r.ParseMultipartForm(10 << 20)
 
 	var dto model.DTO
-	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+	if err := json.NewDecoder(strings.NewReader(r.FormValue("data"))).Decode(&dto); err != nil {
 		slog.Error("Error al decodificar body en Update", "error", err)
 		http.Error(w, `{"error":"JSON invalido o vacio"}`, http.StatusBadRequest)
 		return
+	}
+
+	//Parseo y guardado de Imagen
+	file, handle, err := r.FormFile("imagen")
+	if err == nil {
+		dto.ImageURL, err = utils.GuardarImagen(file, handle, "gpus")
+		if err != nil {
+			slog.Error("Error al guardar imagen del request en Create", "error", err)
+			http.Error(w, `{"error":"No se pudo crear el disco"}`, http.StatusInternalServerError)
+			return
+		}
 	}
 
 	dto.ID = id

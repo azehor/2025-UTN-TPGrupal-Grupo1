@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"quepc/api/internal/softwares/model"
+	"quepc/api/utils"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -50,6 +51,11 @@ func (s *Softwares) List(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	for _, sof := range softwares {
+		sof.ImageURL = utils.CompletarImageURL(r.Host, sof.ImageURL)
+	}
+
 	if err := json.NewEncoder(w).Encode(softwares.ToDto()); err != nil {
 		slog.Error("Error al codificar softwares a JSON", "error", err)
 		http.Error(w, `{"error":"Error interno al generar la respuesta"}`, http.StatusInternalServerError)
@@ -60,9 +66,10 @@ func (s *Softwares) List(w http.ResponseWriter, r *http.Request) {
 func (s *Softwares) Create(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var dto model.DTO
+	r.ParseMultipartForm(10 << 20)
 
 	// Decodificar el body para obtener el dto
-	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+	if err := json.NewDecoder(strings.NewReader(r.FormValue("data"))).Decode(&dto); err != nil {
 		slog.Error("Error al decodificar body en Create", "error", err)
 		http.Error(w, `{"error":"JSON inválido o vacío"}`, http.StatusBadRequest)
 		return
@@ -73,6 +80,20 @@ func (s *Softwares) Create(w http.ResponseWriter, r *http.Request) {
 
 	if strings.TrimSpace(dto.Nombre) == "" {
 		http.Error(w, `{"error":"El campo 'nombre' es requerido"}`, http.StatusBadRequest)
+		return
+	}
+
+	//Parseo y guardado de Imagen
+	file, handle, err := r.FormFile("imagen")
+	if err != nil {
+		slog.Error("Error al leer imagen del request en Create", "error", err)
+		http.Error(w, `{"error":"Campo 'imagen' invalido o vacio"}`, http.StatusBadRequest)
+		return
+	}
+	dto.ImageURL, err = utils.GuardarImagen(file, handle, "softwares")
+	if err != nil {
+		slog.Error("Error al guardar imagen del request en Create", "error", err)
+		http.Error(w, `{"error":"No se pudo crear el disco"}`, http.StatusInternalServerError)
 		return
 	}
 
@@ -93,6 +114,9 @@ func (s *Softwares) Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"No se pudo crear el software"}`, http.StatusInternalServerError)
 		return
 	}
+
+	created.ImageURL = utils.CompletarImageURL(r.Host, created.ImageURL)
+
 	w.WriteHeader(http.StatusCreated) // Codigo 201
 
 	if err := json.NewEncoder(w).Encode(created.ToDto()); err != nil {
@@ -129,6 +153,8 @@ func (s *Softwares) Read(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sw.ImageURL = utils.CompletarImageURL(r.Host, sw.ImageURL)
+
 	if err := json.NewEncoder(w).Encode(sw.ToDto()); err != nil {
 		slog.Error("Error al codificar software leído", "error", err)
 		http.Error(w, `{"error":"Error interno al generar la respuesta"}`, http.StatusInternalServerError)
@@ -145,15 +171,27 @@ func (s *Softwares) Update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"ID inválido"}`, http.StatusBadRequest)
 		return
 	}
+	r.ParseMultipartForm(10 << 20)
 
 	var dto model.DTO
-	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+	if err := json.NewDecoder(strings.NewReader(r.FormValue("data"))).Decode(&dto); err != nil {
 		slog.Error("Error al decodificar body en Update", "error", err)
 		http.Error(w, `{"error":"JSON inválido o vacío"}`, http.StatusBadRequest)
 		return
 	}
 
 	dto.ID = id
+
+	//Parseo y guardado de Imagen
+	file, handle, err := r.FormFile("imagen")
+	if err == nil {
+		dto.ImageURL, err = utils.GuardarImagen(file, handle, "softwares")
+		if err != nil {
+			slog.Error("Error al guardar imagen del request en Create", "error", err)
+			http.Error(w, `{"error":"No se pudo crear el disco"}`, http.StatusInternalServerError)
+			return
+		}
+	}
 
 	// Convertir dto a software
 	sw := &model.Software{
@@ -195,6 +233,8 @@ func (s *Softwares) Update(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	updated.ImageURL = utils.CompletarImageURL(r.Host, updated.ImageURL)
 
 	if err := json.NewEncoder(w).Encode(updated.ToDto()); err != nil {
 		slog.Error("Error al codificar software actualizado", "error", err)
