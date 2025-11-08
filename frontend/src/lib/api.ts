@@ -36,6 +36,7 @@ export interface GenericItem {
   orden_grafica?: number;
   orden_procesador?: number;
   orden_ram?: number;
+  carrera?: string;
   
   // Component fields
   fabricante?: string;
