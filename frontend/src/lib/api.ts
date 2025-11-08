@@ -40,7 +40,7 @@ export interface GenericItem {
   
   // Component fields
   fabricante?: string;
-  msrp?: number;
+  msrp?: string;
   
   // Gabinete
   form_factor?: string;
@@ -78,12 +78,16 @@ class ApiService {
     const url = `${API_BASE_URL}/${endpoint}`;
     
     const config: RequestInit = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
       ...options,
     };
+
+    // Solo agregar Content-Type si no es FormData
+    if (!(options.body instanceof FormData)) {
+      config.headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      };
+    }
 
     const response = await fetch(url, config);
     
@@ -108,12 +112,13 @@ class ApiService {
   }
 
   // Crear un nuevo item
-  async create(entityType: EntityType, data: Partial<GenericItem>): Promise<GenericItem> {
+  async create(entityType: EntityType, data: Partial<GenericItem>, imageFile?: File): Promise<GenericItem> {
     const endpoint = ENTITY_ENDPOINTS[entityType];
     
-    // Remover el ID para creación
-    const { id, ...createData } = data;
+    // Remover el ID y la imagen URL para creación
+    const { id, image_url, ...createData } = data;
     
+    // TEMPORALMENTE: Solo enviar JSON, ignorar imágenes hasta implementar backend
     return this.request<GenericItem>(endpoint, {
       method: 'POST',
       body: JSON.stringify(createData),
@@ -121,14 +126,15 @@ class ApiService {
   }
 
   // Actualizar un item existente
-  async update(entityType: EntityType, id: string, data: Partial<GenericItem>): Promise<GenericItem> {
+  async update(entityType: EntityType, id: string, data: Partial<GenericItem>, imageFile?: File): Promise<GenericItem> {
     const endpoint = ENTITY_ENDPOINTS[entityType];
     
-    // Remover el ID del body
-    const { id: _, ...updateData } = data;
+    // Remover el ID y la imagen URL del body
+    const { id: _, image_url, ...updateData } = data;
     
+    // TEMPORALMENTE: Solo enviar JSON, ignorar imágenes hasta implementar backend
     return this.request<GenericItem>(`${endpoint}/${id}`, {
-      method: 'PUT', 
+      method: 'PUT',
       body: JSON.stringify(updateData),
     });
   }
