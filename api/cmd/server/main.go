@@ -11,7 +11,7 @@ import (
 	//internal project imports
 	"quepc/api/internal/carreras"
 	cStore "quepc/api/internal/carreras/store"
-	//"quepc/api/internal/middleware"
+	"quepc/api/internal/middleware"
 	"quepc/api/internal/recomendaciones"
 
 	"quepc/api/internal/softwares"
@@ -53,7 +53,7 @@ import (
 func Start(addr string) error {
 	r := chi.NewRouter()
 
-	//r.Use(middleware.ContentTypeMiddleware)
+	r.Use(middleware.ContentTypeMiddleware)
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:5173"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},

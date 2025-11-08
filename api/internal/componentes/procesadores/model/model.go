@@ -8,7 +8,7 @@ type DTO struct {
 	Threads    int    `json:"threads"`
 	Generacion string `json:"generacion"`
 	Consumo    int    `json:"consumo"`
-	MSRP       int    `json:"msrp"`
+	MSRP       string `json:"msrp"`
 	ImageURL   string `json:"image_url"`
 	Orden      int    `json:"orden"`
 	Habilitado bool   `json:"habilitado"`
@@ -22,7 +22,7 @@ type Procesador struct {
 	Threads    int    `gorm:"default:1"`
 	Generacion string `gorm:"type:varchar(10)"`
 	Consumo    int    `gorm:"default:0"`
-	MSRP       int    `gorm:"default:0"`
+	MSRP       string `gorm:"default:0"`
 	ImageURL   string `gorm:"type:text"`
 	Orden      int    `gorm:"default:0"`
 	Habilitado bool   `gorm:"type:bool;default:false"`

@@ -6,7 +6,7 @@ type DTO struct {
 	Fabricante  string `json:"fabricante"`
 	FormFactor  string `json:"form_factor"`
 	MaxLargoGPU int    `json:"max_largo_gpu"`
-	MSRP        int    `json:"msrp"`
+	MSRP        string `json:"msrp"`
 	ImageURL    string `json:"image_url"`
 	Orden       int    `json:"orden"`
 	Habilitado  bool   `json:"habilitado"`
@@ -18,7 +18,7 @@ type Gabinete struct {
 	Fabricante  string `gorm:"type:varchar(20);not null"`
 	FormFactor  string `gorm:"type:varchar(10);not null"`
 	MaxLargoGPU int    `gorm:"default:0"`
-	MSRP        int    `gorm:"default:0"`
+	MSRP        string `gorm:"default:0"`
 	ImageURL    string `gorm:"type:text"`
 	Orden       int    `gorm:"default:0"`
 	Habilitado  bool   `gorm:"type:bool;default:false"`
