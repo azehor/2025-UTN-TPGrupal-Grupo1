@@ -8,7 +8,7 @@ const emptyTemplate = (tipo: EntityType): GenericItem => {
 	const base: GenericItem = { id: "", nombre: "" };
 	switch (tipo) {
 		case "software":
-			return { ...base, tipo: "", empresa: "", image_url: "", orden_grafica: 0, orden_procesador: 0, orden_ram: 0 };
+			return { ...base, tipo: "", empresa: "", image_url: "", orden_grafica: 0, orden_procesador: 0, orden_ram: 0, carrera: "" };
 		case "gabinete":
 			return { ...base, fabricante: "", form_factor: "", image_url: "", max_largo_gpu_float: 0, msrp: 0, socket: "" };
 		case "procesador":
@@ -38,17 +38,41 @@ const PanelDeAdmin: FC = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [statsData, setStatsData] = useState<Record<EntityType, number>>({} as Record<EntityType, number>);
 	const [statsLoading, setStatsLoading] = useState(true);
+	const [searchTerm, setSearchTerm] = useState<string>('');
+	const [filteredSearchTerm, setFilteredSearchTerm] = useState<string>('');
+	const [carreras, setCarreras] = useState<GenericItem[]>([]);
+	const [carrerasLoading, setCarrerasLoading] = useState(true);
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (viewMode === 'list') {
 			loadItems();
 		}
+		// Limpiar búsqueda al cambiar de vista
+		setSearchTerm('');
+		setFilteredSearchTerm('');
 	}, [selectedType, viewMode]);
 
 	useEffect(() => {
 		loadStatsData();
+		loadCarreras();
 	}, []);
+
+	async function loadCarreras() {
+		setCarrerasLoading(true);
+		try {
+			const data = await apiService.list('carrera');
+			setCarreras(data);
+		} catch (err) {
+			console.error('Error loading carreras:', err);
+		} finally {
+			setCarrerasLoading(false);
+		}
+	}
+
+	function performSearch() {
+		setFilteredSearchTerm(searchTerm.trim());
+	}
 
 	async function loadStatsData() {
 		setStatsLoading(true);
@@ -159,6 +183,90 @@ const PanelDeAdmin: FC = () => {
 		}
 	}
 
+	// Filtrar items según el término de búsqueda (optimizado por tipo de componente)
+	const filteredItems = items.filter(item => {
+		if (!filteredSearchTerm) return true;
+		
+		const searchLower = filteredSearchTerm.toLowerCase();
+		const matchesName = item.nombre?.toLowerCase().includes(searchLower);
+		
+		// Búsqueda específica por tipo de componente
+		switch (selectedType) {
+			case 'software':
+				const matchesTipo = item.tipo?.toLowerCase().includes(searchLower);
+				const matchesEmpresa = item.empresa?.toLowerCase().includes(searchLower);
+				const matchesCarrera = item.carrera?.toLowerCase().includes(searchLower);
+				return matchesName || matchesTipo || matchesEmpresa || matchesCarrera;
+				
+			case 'procesador':
+				const matchesFabricanteCPU = item.fabricante?.toLowerCase().includes(searchLower);
+				const matchesGeneracion = item.generacion?.toLowerCase().includes(searchLower);
+				return matchesName || matchesFabricanteCPU || matchesGeneracion;
+				
+			case 'placaGrafica':
+				const matchesFabricanteGPU = item.fabricante?.toLowerCase().includes(searchLower);
+				const matchesModeloGPU = item.modelo?.toLowerCase().includes(searchLower);
+				return matchesName || matchesFabricanteGPU || matchesModeloGPU;
+				
+			case 'placaMadre':
+				const matchesModeloMB = item.modelo?.toLowerCase().includes(searchLower);
+				const matchesFabricanteMB = item.fabricante?.toLowerCase().includes(searchLower);
+				return matchesName || matchesModeloMB || matchesFabricanteMB;
+				
+			case 'almacenamiento':
+				const matchesFabricanteHDD = item.fabricante?.toLowerCase().includes(searchLower);
+				const matchesTipoAlmacenamiento = item.tipo_almacenamiento?.toLowerCase().includes(searchLower);
+				return matchesName || matchesFabricanteHDD || matchesTipoAlmacenamiento;
+				
+			case 'memoriaRam':
+				const matchesFabricanteRAM = item.fabricante?.toLowerCase().includes(searchLower);
+				const matchesGeneracionRAM = item.generacion?.toLowerCase().includes(searchLower);
+				return matchesName || matchesFabricanteRAM || matchesGeneracionRAM;
+				
+			case 'gabinete':
+				const matchesFabricanteCase = item.fabricante?.toLowerCase().includes(searchLower);
+				const matchesFormFactor = item.form_factor?.toLowerCase().includes(searchLower);
+				return matchesName || matchesFabricanteCase || matchesFormFactor;
+				
+			case 'fuente':
+				const matchesFabricantePSU = item.fabricante?.toLowerCase().includes(searchLower);
+				return matchesName || matchesFabricantePSU;
+				
+			case 'carrera':
+				// Solo buscar por nombre para carreras
+				return matchesName;
+				
+			default:
+				return matchesName;
+		}
+	});
+
+	// Obtener placeholder dinámico según el tipo de componente
+	const getSearchPlaceholder = (type: EntityType): string => {
+		switch (type) {
+			case 'software':
+				return 'Buscar software por nombre, tipo, empresa o carrera...';
+			case 'procesador':
+				return 'Buscar procesador por nombre, fabricante o generación...';
+			case 'placaGrafica':
+				return 'Buscar placa gráfica por nombre, fabricante o modelo...';
+			case 'placaMadre':
+				return 'Buscar placa madre por nombre, modelo o fabricante...';
+			case 'almacenamiento':
+				return 'Buscar almacenamiento por nombre, fabricante o tipo...';
+			case 'memoriaRam':
+				return 'Buscar memoria RAM por nombre, fabricante o generación...';
+			case 'gabinete':
+				return 'Buscar gabinete por nombre, fabricante o form factor...';
+			case 'fuente':
+				return 'Buscar fuente por nombre o fabricante...';
+			case 'carrera':
+				return 'Buscar carrera por nombre...';
+			default:
+				return `Buscar ${type} por nombre...`;
+		}
+	};
+
 	const entities = [
 		{ key: 'software', label: 'Software', icon: 'apps', description: 'Aplicaciones y juegos' },
 		{ key: 'carrera', label: 'Carreras', icon: 'school', description: 'Carreras universitarias' },
@@ -207,6 +315,49 @@ const PanelDeAdmin: FC = () => {
 								<input type="number" value={form.orden_ram || 0} onChange={(e) => handleChange('orden_ram', Number(e.target.value))} className={inputClass} />
 							</div>
 						</div>
+						<div>
+							<label className={labelClass}>Carrera *</label>
+							<select 
+								value={form.carrera || ''} 
+								onChange={(e) => handleChange('carrera', e.target.value)} 
+								className={inputClass}
+								required
+								disabled={carrerasLoading}
+							>
+								<option value="">
+									{carrerasLoading ? 'Cargando carreras...' : 'Seleccionar carrera...'}
+								</option>
+								<option value="videojuego">Video juego</option>
+								{carreras.length > 0 ? (
+									carreras.map((carrera) => (
+										<option key={carrera.id} value={carrera.nombre}>
+											{carrera.nombre}
+										</option>
+									))
+								) : (
+									!carrerasLoading && (
+										<option value="" disabled>
+											No hay carreras disponibles
+										</option>
+									)
+								)}
+							</select>
+							{carrerasLoading && (
+								<p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+									Cargando carreras desde la base de datos...
+								</p>
+							)}
+							{!carrerasLoading && carreras.length === 0 && (
+								<p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
+									⚠️ No se encontraron carreras en la base de datos
+								</p>
+							)}
+							{!carrerasLoading && carreras.length > 0 && (
+								<p className="text-xs text-green-600 dark:text-green-400 mt-1">
+									✅ {carreras.length} carrera(s) cargada(s) desde la base de datos
+								</p>
+							)}
+						</div>
 					</div>
 				);
 			case 'carrera':
@@ -242,19 +393,19 @@ const PanelDeAdmin: FC = () => {
 	};
 
 	return (
-		<div className="relative flex min-h-screen bg-[#101c22] font-['Space_Grotesk',sans-serif]">
+		<div className="relative flex min-h-screen bg-gray-50 dark:bg-gray-900 font-sans">
 			{/* Sidebar Navigation */}
-			<aside className="w-64 bg-[#1a2831] border-r border-gray-600 flex flex-col">
-				<div className="p-4 border-b border-gray-600">
-					<h1 className="text-2xl font-bold text-white">PC Recs Admin</h1>
+			<aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+				<div className="p-4 border-b border-gray-200 dark:border-gray-700">
+					<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">PC Recs Admin</h1>
 				</div>
 				<nav className="flex-1 p-4 space-y-2">
 					<a 
 						href="#" 
 						className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium ${
 							viewMode === 'choose' 
-								? 'bg-[#13a4ec]/20 text-[#13a4ec]' 
-								: 'text-gray-400 hover:bg-gray-700 hover:text-white'
+								? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' 
+								: 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
 						}`}
 						onClick={(e) => { e.preventDefault(); setViewMode('choose'); }}
 					>
@@ -267,8 +418,8 @@ const PanelDeAdmin: FC = () => {
 							href="#"
 							className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium ${
 								selectedType === entity.key && viewMode !== 'choose'
-									? 'bg-[#13a4ec]/20 text-[#13a4ec]'
-									: 'text-gray-400 hover:bg-gray-700 hover:text-white'
+									? 'bg-blue-500/20 text-blue-600 dark:text-blue-400'
+									: 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
 							}`}
 							onClick={(e) => {
 								e.preventDefault();
@@ -283,10 +434,10 @@ const PanelDeAdmin: FC = () => {
 						</a>
 					))}
 				</nav>
-				<div className="p-4 border-t border-gray-600">
+				<div className="p-4 border-t border-gray-200 dark:border-gray-700">
 					<button
 						onClick={() => { logoutStaff(); navigate('/login'); }}
-						className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white w-full font-medium"
+						className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 w-full font-medium"
 					>
 						<span className="material-symbols-outlined text-xl">logout</span>
 						<span>Cerrar sesión</span>
@@ -297,14 +448,33 @@ const PanelDeAdmin: FC = () => {
 			{/* Main Content */}
 			<div className="flex-1 flex flex-col">
 				{/* Top Header Bar */}
-				<header className="flex items-center justify-between p-4 bg-[#1a2831] border-b border-gray-600">
-					<div className="relative w-full max-w-md">
-						<span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
-						<input 
-							className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100" 
-							placeholder="Buscar componentes..." 
-							type="text"
-						/>
+				<header className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+					<div className="flex items-center gap-4 flex-1">
+						{viewMode === 'list' && (
+							<div className="relative w-full max-w-md">
+								<span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+								<input 
+									className="w-full pl-10 pr-16 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100" 
+									placeholder={getSearchPlaceholder(selectedType)}
+									type="text"
+									value={searchTerm}
+									onChange={(e) => setSearchTerm(e.target.value)}
+									onKeyDown={(e) => e.key === 'Enter' && performSearch()}
+								/>
+								<button
+									className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+									onClick={performSearch}
+								>
+									<span className="material-symbols-outlined text-sm">search</span>
+								</button>
+							</div>
+						)}
+						{viewMode === 'choose' && (
+							<button className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors whitespace-nowrap">
+								<span className="material-symbols-outlined text-sm">sync</span>
+								Scrapear datos
+							</button>
+						)}
 					</div>
 					<div className="flex items-center gap-4">
 						<button className="p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -319,7 +489,7 @@ const PanelDeAdmin: FC = () => {
 				</header>
 
 				{/* Main Content Area */}
-				<main className="flex-1 p-6 space-y-6 bg-[#101c22]">
+				<main className="flex-1 p-6 space-y-6 bg-gray-50 dark:bg-gray-900">
 					{viewMode === 'choose' && (
 						<div>
 							{/* Page Heading */}
@@ -329,27 +499,27 @@ const PanelDeAdmin: FC = () => {
 
 							{/* Stats */}
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-								<div className="flex flex-col gap-2 rounded-lg p-6 bg-[#1a2831] border border-gray-600">
-									<p className="text-gray-400 text-base font-medium leading-normal">Total Software</p>
-									<p className="text-white tracking-light text-2xl font-bold leading-tight">
+								<div className="flex flex-col gap-2 rounded-lg p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+									<p className="text-gray-600 dark:text-gray-400 text-base font-medium leading-normal">Total Software</p>
+									<p className="text-gray-900 dark:text-gray-100 tracking-light text-2xl font-bold leading-tight">
 										{statsLoading ? '...' : (statsData.software || 0)}
 									</p>
 								</div>
-								<div className="flex flex-col gap-2 rounded-lg p-6 bg-[#1a2831] border border-gray-600">
-									<p className="text-gray-400 text-base font-medium leading-normal">Total Procesadores</p>
-									<p className="text-white tracking-light text-2xl font-bold leading-tight">
+								<div className="flex flex-col gap-2 rounded-lg p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+									<p className="text-gray-600 dark:text-gray-400 text-base font-medium leading-normal">Total Procesadores</p>
+									<p className="text-gray-900 dark:text-gray-100 tracking-light text-2xl font-bold leading-tight">
 										{statsLoading ? '...' : (statsData.procesador || 0)}
 									</p>
 								</div>
-								<div className="flex flex-col gap-2 rounded-lg p-6 bg-[#1a2831] border border-gray-600">
-									<p className="text-gray-400 text-base font-medium leading-normal">Total Placas Gráficas</p>
-									<p className="text-white tracking-light text-2xl font-bold leading-tight">
+								<div className="flex flex-col gap-2 rounded-lg p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+									<p className="text-gray-600 dark:text-gray-400 text-base font-medium leading-normal">Total Placas Gráficas</p>
+									<p className="text-gray-900 dark:text-gray-100 tracking-light text-2xl font-bold leading-tight">
 										{statsLoading ? '...' : (statsData.placaGrafica || 0)}
 									</p>
 								</div>
-								<div className="flex flex-col gap-2 rounded-lg p-6 bg-[#1a2831] border border-gray-600">
-									<p className="text-gray-400 text-base font-medium leading-normal">Total Almacenamiento</p>
-									<p className="text-white tracking-light text-2xl font-bold leading-tight">
+								<div className="flex flex-col gap-2 rounded-lg p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+									<p className="text-gray-600 dark:text-gray-400 text-base font-medium leading-normal">Total Almacenamiento</p>
+									<p className="text-gray-900 dark:text-gray-100 tracking-light text-2xl font-bold leading-tight">
 										{statsLoading ? '...' : (statsData.almacenamiento || 0)}
 									</p>
 								</div>
@@ -413,69 +583,6 @@ const PanelDeAdmin: FC = () => {
 									</div>
 								</div>
 							</div>
-
-							{/* Categories Grid */}
-							<div>
-								<div className="flex justify-between items-center pb-3 pt-5">
-									<h2 className="text-gray-900 dark:text-gray-100 text-[22px] font-bold leading-tight tracking-[-0.015em]">Categorías de Gestión</h2>
-								</div>
-								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-									{entities.map((t) => {
-										const count = statsLoading ? '...' : (statsData[t.key] || 0);
-										const hasItems = !statsLoading && (statsData[t.key] || 0) > 0;
-										
-										return (
-											<div
-												key={t.key}
-												className="group relative bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-200 cursor-pointer hover:shadow-lg"
-												onClick={() => { setSelectedType(t.key); setForm(emptyTemplate(t.key)); setEditingId(null); }}
-											>
-												<div className="p-6">
-													<div className="flex items-center justify-between mb-4">
-														<span className="material-symbols-outlined text-4xl text-blue-600 dark:text-blue-400">{t.icon}</span>
-														<div className="text-right">
-															<div className="text-lg font-bold text-gray-900 dark:text-gray-100">{count}</div>
-															<div className="text-xs text-gray-500 dark:text-gray-400">
-																{statsLoading ? 'Cargando...' : hasItems ? 'elementos' : 'Sin elementos'}
-															</div>
-														</div>
-													</div>
-													<h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">{t.label}</h3>
-													<p className="text-gray-600 dark:text-gray-400 text-sm mb-4">{t.description}</p>
-													
-													{!statsLoading && !hasItems && (
-														<div className="mb-4 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-yellow-700 dark:text-yellow-400 text-xs">
-															🚫 Aún no hay elementos cargados
-														</div>
-													)}
-													
-													<div className="flex gap-2">
-														<button
-															className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1"
-															onClick={(e) => { e.stopPropagation(); setSelectedType(t.key); setForm(emptyTemplate(t.key)); setViewMode('form'); }}
-														>
-															<span className="material-symbols-outlined text-sm">add</span>
-															Agregar
-														</button>
-														<button
-															className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1 ${
-																hasItems 
-																	? 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300'
-																	: 'bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-															}`}
-															onClick={(e) => { e.stopPropagation(); if (hasItems) { setSelectedType(t.key); setViewMode('list'); } }}
-															disabled={!hasItems}
-														>
-															<span className="material-symbols-outlined text-sm">list</span>
-															Ver Lista
-														</button>
-													</div>
-												</div>
-											</div>
-										);
-									})}
-								</div>
-							</div>
 						</div>
 					)}
 
@@ -484,10 +591,10 @@ const PanelDeAdmin: FC = () => {
 							<div className="mb-6">
 								<button 
 									className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors"
-									onClick={() => setViewMode('choose')}
+									onClick={() => setViewMode('list')}
 								>
 									<span className="material-symbols-outlined">arrow_back</span>
-									Volver
+									Volver a la lista
 								</button>
 							</div>
 
@@ -520,25 +627,13 @@ const PanelDeAdmin: FC = () => {
 										</div>
 									)}
 
-									<div className="flex gap-4">
+									<div>
 										<button 
 											type="submit" 
 											disabled={loading}
-											className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-lg font-medium transition-colors"
+											className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-lg font-medium transition-colors"
 										>
 											{loading ? 'Guardando...' : (editingId ? "Guardar" : "Crear")}
-										</button>
-										<button
-											type="button"
-											disabled={loading}
-											className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors"
-											onClick={() => {
-												setForm(emptyTemplate(selectedType));
-												setEditingId(null);
-												setError(null);
-											}}
-										>
-											Cancelar
 										</button>
 									</div>
 								</form>
@@ -561,7 +656,12 @@ const PanelDeAdmin: FC = () => {
 							<div className="flex justify-between items-center mb-6">
 								<div>
 									<h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 capitalize">{selectedType}</h2>
-									<p className="text-gray-600 dark:text-gray-400">Total de items: {items.length}</p>
+									<p className="text-gray-600 dark:text-gray-400">
+										{filteredSearchTerm ? 
+											`${filteredItems.length} de ${items.length} items (buscando: "${filteredSearchTerm}")` : 
+											`Total de items: ${items.length}`
+										}
+									</p>
 								</div>
 								<button 
 									className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
@@ -587,6 +687,19 @@ const PanelDeAdmin: FC = () => {
 								<div className="text-center py-12">
 									<p className="text-gray-500 dark:text-gray-400 text-lg">No hay items cargados aún</p>
 								</div>
+							) : filteredItems.length === 0 ? (
+								<div className="text-center py-12">
+									<p className="text-gray-500 dark:text-gray-400 text-lg">No se encontraron resultados para "{filteredSearchTerm}"</p>
+									<button
+										className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+										onClick={() => {
+											setSearchTerm('');
+											setFilteredSearchTerm('');
+										}}
+									>
+										Limpiar búsqueda
+									</button>
+								</div>
 							) : (
 								<div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
 									<div className="overflow-x-auto">
@@ -600,7 +713,7 @@ const PanelDeAdmin: FC = () => {
 												</tr>
 											</thead>
 											<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-												{items.map((it) => (
+												{filteredItems.map((it) => (
 													<tr key={it.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
 														<td className="px-6 py-4 whitespace-nowrap">
 															<div className="text-sm font-medium text-gray-900 dark:text-gray-100">{it.nombre}</div>
