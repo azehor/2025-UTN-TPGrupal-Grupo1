@@ -45,8 +45,6 @@ const PanelDeAdmin: FC = () => {
 	const [selectedImage, setSelectedImage] = useState<File | null>(null);
 	const [imagePreview, setImagePreview] = useState<string | null>(null);
 	const [dragActive, setDragActive] = useState(false);
-	const [showImageErrorPopup, setShowImageErrorPopup] = useState(false);
-	const [imageErrorMessage, setImageErrorMessage] = useState<string>('');
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -86,16 +84,14 @@ const PanelDeAdmin: FC = () => {
 		// Validar tamaño (10MB máximo)
 		const maxSize = 10 * 1024 * 1024; // 10MB en bytes
 		if (file.size > maxSize) {
-			setImageErrorMessage('La imagen no puede ser mayor a 10MB');
-			setShowImageErrorPopup(true);
+			setError('La imagen no puede ser mayor a 10MB');
 			return false;
 		}
 
 		// Validar tipo de archivo (solo JPG)
 		const validTypes = ['image/jpeg', 'image/jpg'];
 		if (!validTypes.includes(file.type)) {
-			setImageErrorMessage('Solo se permiten archivos JPG');
-			setShowImageErrorPopup(true);
+			setError('Solo se permiten archivos JPG');
 			return false;
 		}
 
@@ -431,7 +427,7 @@ const PanelDeAdmin: FC = () => {
 												</label>
 											</div>
 											<p className="text-xs text-gray-500 dark:text-gray-400">
-												JPG (máx. 10MB)
+												JPG, PNG, GIF, WebP (máx. 10MB)
 											</p>
 										</div>
 									)}
@@ -448,9 +444,6 @@ const PanelDeAdmin: FC = () => {
 							<div>
 								<label className={labelClass}>Orden gráfica</label>
 								<input type="number" value={form.orden_grafica || 0} onChange={(e) => handleChange('orden_grafica', Number(e.target.value))} className={inputClass} />
-								<p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-									Si el software no necesita una gráfica dedicada dejar en 0
-								</p>
 							</div>
 							<div>
 								<label className={labelClass}>Orden procesador</label>
@@ -462,15 +455,16 @@ const PanelDeAdmin: FC = () => {
 							</div>
 						</div>
 						<div>
-							<label className={labelClass}>Carrera (opcional)</label>
+							<label className={labelClass}>Carrera *</label>
 							<select 
 								value={form.carrera || ''} 
 								onChange={(e) => handleChange('carrera', e.target.value)} 
 								className={inputClass}
+								required
 								disabled={carrerasLoading}
 							>
 								<option value="">
-									{carrerasLoading ? 'Cargando carreras...' : 'Sin carrera específica'}
+									{carrerasLoading ? 'Cargando carreras...' : 'Seleccionar carrera...'}
 								</option>
 								<option value="videojuego">Video juego</option>
 								{carreras.length > 0 ? (
@@ -977,33 +971,6 @@ const PanelDeAdmin: FC = () => {
 					)}
 				</main>
 			</div>
-
-			{/* Popup modal para errores de imagen */}
-			{showImageErrorPopup && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-					<div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-md w-full mx-4">
-						<div className="p-6">
-							<div className="flex items-center mb-4">
-								<span className="material-symbols-outlined text-red-500 text-2xl mr-3">error</span>
-								<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-									Error de formato de imagen
-								</h3>
-							</div>
-							<p className="text-gray-600 dark:text-gray-300 mb-6">
-								{imageErrorMessage}
-							</p>
-							<div className="flex justify-end">
-								<button
-									onClick={() => setShowImageErrorPopup(false)}
-									className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-								>
-									OK
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			)}
 		</div>
 	);
 };
