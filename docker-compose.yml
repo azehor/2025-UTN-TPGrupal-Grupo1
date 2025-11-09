@@ -49,12 +49,20 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    # Montar carpeta de estáticos (solo lectura) para servir imágenes
+    volumes:
+      - ./api/static:/home/appuser/static:ro
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.api.rule=Host(`api.quepc.home`)
       - traefik.http.routers.api.entrypoints=web
       - traefik.http.services.api.loadbalancer.server.port=8080
+      # Servir estáticos bajo el host principal
+      - traefik.http.routers.api-static.rule=Host(`quepc.home`) && PathPrefix(`/static`)
+      - traefik.http.routers.api-static.entrypoints=web
+      - traefik.http.routers.api-static.service=api
+      - traefik.http.routers.api-static.priority=9999
       # También enrutar peticiones con PathPrefix /v1 y host principal al servicio api
       - traefik.http.routers.api-v1.rule=Host(`quepc.home`) && PathPrefix(`/v1`)
       - traefik.http.routers.api-v1.entrypoints=web

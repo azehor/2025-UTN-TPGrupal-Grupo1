@@ -12,6 +12,8 @@ FROM alpine:3.20
 RUN adduser -D -u 10001 appuser
 WORKDIR /home/appuser
 COPY --from=builder /bin/quepc /usr/local/bin/quepc
+ # Copiamos estructura vacía de static/images para que el path exista aunque se use volumen externo
+RUN mkdir -p /home/appuser/static/images/carreras /home/appuser/static/images/juegos /home/appuser/static/images/softwares
 EXPOSE 8080
 ENV APP_ENV=production APP_HOST=0.0.0.0 APP_PORT=8080
 USER appuser

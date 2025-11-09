@@ -50,6 +50,10 @@ func (s *Server) AddRoutes(r *chi.Mux) {
 	r.Get("/", s.getHomepage)
 
 	workdir, _ := os.Getwd()
+	// Servir toda la carpeta /static
+	staticDir := http.Dir(filepath.Join(workdir, "static"))
+	FileServer(r, "/static", staticDir)
+	// Compatibilidad con rutas antiguas /static/images
 	imgDir := http.Dir(filepath.Join(workdir, "static/images"))
 	FileServer(r, "/static/images", imgDir)
 

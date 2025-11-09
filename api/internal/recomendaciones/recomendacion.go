@@ -188,7 +188,7 @@ func (rec *Recomendaciones) buildRecommendation(ids []string) (model.Recomendaci
 			}
 		}
 		if chosen != nil {
-			reco = append(reco, &model.Componente{ID: chosen.ID, Nombre: chosen.Nombre, Tipo: "GPU", Precio: chosen.MSRP, ImageURL: chosen.ImageURL, Orden: chosen.Orden})
+			reco = append(reco, &model.Componente{ID: chosen.ID, Nombre: chosen.Nombre, Tipo: "GPU", Precio: float64(chosen.MSRP), ImageURL: chosen.ImageURL, Orden: chosen.Orden})
 		}
 	}
 
@@ -208,7 +208,7 @@ func (rec *Recomendaciones) buildRecommendation(ids []string) (model.Recomendaci
 			}
 		}
 		if chosen != nil {
-			reco = append(reco, &model.Componente{ID: chosen.ID, Nombre: chosen.Nombre, Tipo: "Procesador", Precio: chosen.MSRP, ImageURL: chosen.ImageURL, Orden: chosen.Orden})
+			reco = append(reco, &model.Componente{ID: chosen.ID, Nombre: chosen.Nombre, Tipo: "Procesador", Precio: float64(chosen.MSRP), ImageURL: chosen.ImageURL, Orden: chosen.Orden})
 		}
 	}
 
@@ -248,7 +248,7 @@ func (rec *Recomendaciones) buildRecommendation(ids []string) (model.Recomendaci
 			}
 		}
 		if chosen != nil {
-			reco = append(reco, &model.Componente{ID: chosen.ID, Nombre: chosen.Nombre, Tipo: "Disco", Precio: chosen.MSRP, ImageURL: chosen.ImageURL, Orden: chosen.Orden})
+			reco = append(reco, &model.Componente{ID: chosen.ID, Nombre: chosen.Nombre, Tipo: "Disco", Precio: float64(chosen.MSRP), ImageURL: chosen.ImageURL, Orden: chosen.Orden})
 		}
 	}
 
@@ -264,7 +264,7 @@ func (rec *Recomendaciones) buildRecommendation(ids []string) (model.Recomendaci
 			}
 		}
 		if chosen != nil {
-			reco = append(reco, &model.Componente{ID: chosen.ID, Nombre: chosen.Nombre, Tipo: "Gabinete", Precio: chosen.MSRP, ImageURL: chosen.ImageURL, Orden: chosen.Orden})
+			reco = append(reco, &model.Componente{ID: chosen.ID, Nombre: chosen.Nombre, Tipo: "Gabinete", Precio: float64(chosen.MSRP), ImageURL: chosen.ImageURL, Orden: chosen.Orden})
 		}
 	}
 
@@ -280,7 +280,7 @@ func (rec *Recomendaciones) buildRecommendation(ids []string) (model.Recomendaci
 			}
 		}
 		if chosen != nil {
-			reco = append(reco, &model.Componente{ID: chosen.ID, Nombre: chosen.Modelo, Tipo: "Motherboard", Precio: chosen.MSRP, ImageURL: chosen.ImageURL, Orden: chosen.Orden})
+			reco = append(reco, &model.Componente{ID: chosen.ID, Nombre: chosen.Modelo, Tipo: "Motherboard", Precio: float64(chosen.MSRP), ImageURL: chosen.ImageURL, Orden: chosen.Orden})
 		}
 	}
 
@@ -296,7 +296,7 @@ func (rec *Recomendaciones) buildRecommendation(ids []string) (model.Recomendaci
 			}
 		}
 		if chosen != nil {
-			reco = append(reco, &model.Componente{ID: chosen.ID, Nombre: chosen.Nombre, Tipo: "PSU", Precio: chosen.MSRP, ImageURL: chosen.ImageURL, Orden: chosen.Orden})
+			reco = append(reco, &model.Componente{ID: chosen.ID, Nombre: chosen.Nombre, Tipo: "PSU", Precio: float64(chosen.MSRP), ImageURL: chosen.ImageURL, Orden: chosen.Orden})
 		}
 	}
 

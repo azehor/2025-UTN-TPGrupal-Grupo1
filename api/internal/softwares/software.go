@@ -35,6 +35,8 @@ func (s *Softwares) List(w http.ResponseWriter, r *http.Request) {
 
 	// Leer query param opcional 'tipo' (normal, juego)
 	tipo := r.URL.Query().Get("tipo")
+	// Leer query param opcional 'q' para búsqueda por nombre
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
 
 	// Traer listado de software de la base de datos (posible filtrado por tipo)
 	softwares, err := s.store.ListByTipo(tipo)
@@ -42,6 +44,18 @@ func (s *Softwares) List(w http.ResponseWriter, r *http.Request) {
 		slog.Error("Error en la base de datos al listar softwares", "error", err)
 		http.Error(w, `{"error":"Error interno del servidor"}`, http.StatusInternalServerError)
 		return
+	}
+
+	// Filtro en memoria por nombre si viene 'q'
+	if q != "" {
+		qLower := strings.ToLower(q)
+		filtered := make(model.Softwares, 0, len(softwares))
+		for _, sof := range softwares {
+			if strings.Contains(strings.ToLower(sof.Nombre), qLower) {
+				filtered = append(filtered, sof)
+			}
+		}
+		softwares = filtered
 	}
 
 	if len(softwares) == 0 {
@@ -90,7 +104,12 @@ func (s *Softwares) Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"Campo 'imagen' invalido o vacio"}`, http.StatusBadRequest)
 		return
 	}
-	dto.ImageURL, err = utils.GuardarImagen(file, handle, "softwares")
+	// Redirigir a subcarpeta según tipo (juegos vs softwares)
+	carpeta := "softwares"
+	if strings.EqualFold(strings.TrimSpace(dto.Tipo), "juego") {
+		carpeta = "juegos"
+	}
+	dto.ImageURL, err = utils.GuardarImagen(file, handle, carpeta)
 	if err != nil {
 		slog.Error("Error al guardar imagen del request en Create", "error", err)
 		http.Error(w, `{"error":"No se pudo crear el disco"}`, http.StatusInternalServerError)
@@ -185,7 +204,11 @@ func (s *Softwares) Update(w http.ResponseWriter, r *http.Request) {
 	//Parseo y guardado de Imagen
 	file, handle, err := r.FormFile("imagen")
 	if err == nil {
-		dto.ImageURL, err = utils.GuardarImagen(file, handle, "softwares")
+		carpeta := "softwares"
+		if strings.EqualFold(strings.TrimSpace(dto.Tipo), "juego") {
+			carpeta = "juegos"
+		}
+		dto.ImageURL, err = utils.GuardarImagen(file, handle, carpeta)
 		if err != nil {
 			slog.Error("Error al guardar imagen del request en Create", "error", err)
 			http.Error(w, `{"error":"No se pudo crear el disco"}`, http.StatusInternalServerError)

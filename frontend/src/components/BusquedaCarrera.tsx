@@ -3,6 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useBusqueda } from  "../context/BusquedaContext";
 import { getApiBase } from "../lib/env";
 
+interface CarreraApiDTO {
+  id: string;
+  nombre: string;
+  image_url?: string;
+}
+
 interface Carrera {
   id: string;
   nombre: string;
@@ -33,8 +39,13 @@ export const BusquedaCarrera: React.FC = () => {
         if (!res.ok) {
           throw new Error(`Error HTTP: ${res.status}`);
         }
-        const data: Carrera[] = await res.json();
-        setCarreraList(data);
+        const data: CarreraApiDTO[] = await res.json();
+        const mapped: Carrera[] = data.map((c) => ({
+          id: c.id,
+          nombre: c.nombre,
+          imageURL: c.image_url || "",
+        }));
+        setCarreraList(mapped);
       } catch (err: any) {
         setError(err.message || "Error al obtener listado de carreras");
         console.error(err);

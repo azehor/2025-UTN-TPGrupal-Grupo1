@@ -6,7 +6,7 @@ type DTO struct {
 	Fabricante string `json:"fabricante"`
 	Capacidad  int    `json:"capacidad"`
 	Generacion string `json:"generacion"`
-	MSRP       int    `json:"msrp"`
+	MSRP       float64 `json:"msrp"`
 	ImageURL   string `json:"image_url"`
 	Orden      int    `json:"orden"`
 	Habilitado bool   `json:"habilitado"`
@@ -18,7 +18,7 @@ type RAM struct {
 	Fabricante string `gorm:"type:varchar(20);not null"`
 	Capacidad  int    `gorm:"default:0"`
 	Generacion string `gorm:"type:varchar(10)"`
-	MSRP       int    `gorm:"default:0"`
+	MSRP       float64 `gorm:"default:0"`
 	ImageURL   string `gorm:"type:text"`
 	Orden      int    `gorm:"default:0"`
 	Habilitado bool   `gorm:"type:bool;default:false"`
