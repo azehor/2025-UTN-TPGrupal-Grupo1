@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"quepc/api/internal/carreras/model"
+	"quepc/api/utils"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -47,6 +48,11 @@ func (c *Carreras) List(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	for _, cr := range carreras {
+		cr.ImageURL = utils.CompletarImageURL(r.Host, cr.ImageURL)
+	}
+
 	if err := json.NewEncoder(w).Encode(carreras.ToDto()); err != nil {
 		slog.Error("Error al codificar carreras a JSON", "error", err)
 		http.Error(w, `{"error":"Error interno al generar la respuesta"}`, http.StatusInternalServerError)
@@ -57,9 +63,10 @@ func (c *Carreras) List(w http.ResponseWriter, r *http.Request) {
 func (c *Carreras) Create(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var dto model.DTO
+	r.ParseMultipartForm(10 << 20)
 
 	// Decodificar el body para obtener el dto
-	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+	if err := json.NewDecoder(strings.NewReader(r.FormValue("data"))).Decode(&dto); err != nil {
 		slog.Error("Error al decodificar body en Create", "error", err)
 		http.Error(w, `{"error":"JSON inválido o vacío"}`, http.StatusBadRequest)
 		return
@@ -70,6 +77,20 @@ func (c *Carreras) Create(w http.ResponseWriter, r *http.Request) {
 
 	if strings.TrimSpace(dto.Nombre) == "" {
 		http.Error(w, `{"error":"El campo 'nombre' es requerido"}`, http.StatusBadRequest)
+		return
+	}
+
+	//Parseo y guardado de Imagen
+	file, handle, err := r.FormFile("imagen")
+	if err != nil {
+		slog.Error("Error al leer imagen del request en Create", "error", err)
+		http.Error(w, `{"error":"Campo 'imagen' invalido o vacio"}`, http.StatusBadRequest)
+		return
+	}
+	dto.ImageURL, err = utils.GuardarImagen(file, handle, "carreras")
+	if err != nil {
+		slog.Error("Error al guardar imagen del request en Create", "error", err)
+		http.Error(w, `{"error":"No se pudo crear el disco"}`, http.StatusInternalServerError)
 		return
 	}
 
@@ -86,6 +107,8 @@ func (c *Carreras) Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"No se pudo crear la carrera"}`, http.StatusInternalServerError)
 		return
 	}
+
+	created.ImageURL = utils.CompletarImageURL(r.Host, created.ImageURL)
 
 	w.WriteHeader(http.StatusCreated) // 201
 
@@ -122,6 +145,8 @@ func (s *Carreras) Read(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sw.ImageURL = utils.CompletarImageURL(r.Host, sw.ImageURL)
+
 	if err := json.NewEncoder(w).Encode(sw.ToDto()); err != nil {
 		slog.Error("Error al codificar carrera leída", "error", err)
 		http.Error(w, `{"error":"Error interno al generar la respuesta"}`, http.StatusInternalServerError)
@@ -138,12 +163,24 @@ func (c *Carreras) Update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"ID inválido"}`, http.StatusBadRequest)
 		return
 	}
+	r.ParseMultipartForm(10 << 20)
 
 	var dto model.DTO
-	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+	if err := json.NewDecoder(strings.NewReader(r.FormValue("data"))).Decode(&dto); err != nil {
 		slog.Error("Error al decodificar body en Update", "error", err)
 		http.Error(w, `{"error":"JSON inválido o vacío"}`, http.StatusBadRequest)
 		return
+	}
+
+	//Parseo y guardado de Imagen
+	file, handle, err := r.FormFile("imagen")
+	if err == nil {
+		dto.ImageURL, err = utils.GuardarImagen(file, handle, "carreras")
+		if err != nil {
+			slog.Error("Error al guardar imagen del request en Create", "error", err)
+			http.Error(w, `{"error":"No se pudo crear el disco"}`, http.StatusInternalServerError)
+			return
+		}
 	}
 
 	dto.ID = id
@@ -183,6 +220,8 @@ func (c *Carreras) Update(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	updated.ImageURL = utils.CompletarImageURL(r.Host, updated.ImageURL)
 
 	if err := json.NewEncoder(w).Encode(updated.ToDto()); err != nil {
 		slog.Error("Error al codificar carrera actualizada", "error", err)

@@ -4,7 +4,7 @@ type DTO struct {
 	ID       string `json:"id"`
 	Nombre   string `json:"nombre"`
 	Tipo     string `json:"tipo"`
-	Precio   string `json:"precio"`
+	Precio   int    `json:"precio"`
 	ImageURL string `json:"image_url"`
 	Orden    int    `json:"orden"`
 }
@@ -13,7 +13,7 @@ type Componente struct {
 	ID       string
 	Nombre   string
 	Tipo     string
-	Precio   string
+	Precio   int
 	ImageURL string
 	Orden    int
 }

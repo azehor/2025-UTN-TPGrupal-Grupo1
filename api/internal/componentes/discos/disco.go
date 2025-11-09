@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"quepc/api/internal/componentes/discos/model"
+	"quepc/api/utils"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -44,6 +45,10 @@ func (d *Discos) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	for _, dss := range ds {
+		dss.ImageURL = utils.CompletarImageURL(r.Host, dss.ImageURL)
+	}
+
 	if err := json.NewEncoder(w).Encode(ds.ToDto()); err != nil {
 		slog.Error("Error al codificar discos a JSON", "error", err)
 		http.Error(w, `{"error":"Error interno al generar la respuesta"}`, http.StatusInternalServerError)
@@ -53,8 +58,9 @@ func (d *Discos) List(w http.ResponseWriter, r *http.Request) {
 
 func (d *Discos) Create(w http.ResponseWriter, r *http.Request) {
 	var dto model.DTO
+	r.ParseMultipartForm(10 << 20) // Limite de tamaño de imagen: 10MB
 
-	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+	if err := json.NewDecoder(strings.NewReader(r.FormValue("data"))).Decode(&dto); err != nil {
 		slog.Error("Error al decodificar body en Create", "error", err)
 		http.Error(w, `{"error":"JSON invalido o vacio"}`, http.StatusBadRequest)
 		return
@@ -64,6 +70,20 @@ func (d *Discos) Create(w http.ResponseWriter, r *http.Request) {
 
 	if strings.TrimSpace(dto.Nombre) == "" {
 		http.Error(w, `{"error":"El campo 'nombre' es requerido"}`, http.StatusBadRequest)
+		return
+	}
+
+	//Parseo y guardado de Imagen
+	file, handle, err := r.FormFile("imagen")
+	if err != nil {
+		slog.Error("Error al leer imagen del request en Create", "error", err)
+		http.Error(w, `{"error":"Campo 'imagen' invalido o vacio"}`, http.StatusBadRequest)
+		return
+	}
+	dto.ImageURL, err = utils.GuardarImagen(file, handle, "discos")
+	if err != nil {
+		slog.Error("Error al guardar imagen del request en Create", "error", err)
+		http.Error(w, `{"error":"No se pudo crear el disco"}`, http.StatusInternalServerError)
 		return
 	}
 
@@ -84,6 +104,8 @@ func (d *Discos) Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"No se pudo crear el disco"}`, http.StatusInternalServerError)
 		return
 	}
+
+	created.ImageURL = utils.CompletarImageURL(r.Host, created.ImageURL)
 
 	w.WriteHeader(http.StatusCreated)
 
@@ -115,6 +137,8 @@ func (d *Discos) Read(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ds.ImageURL = utils.CompletarImageURL(r.Host, ds.ImageURL)
+
 	if err := json.NewEncoder(w).Encode(ds.ToDto()); err != nil {
 		slog.Error("Error al codificar el disco leido", "error", err)
 		http.Error(w, `{"error":"Error interno al generar la respuesta"}`, http.StatusInternalServerError)
@@ -128,16 +152,29 @@ func (d *Discos) Update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"ID invalido"}`, http.StatusBadRequest)
 		return
 	}
+	r.ParseMultipartForm(10 << 20)
 
 	var dto model.DTO
-	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+	if err := json.NewDecoder(strings.NewReader(r.FormValue("data"))).Decode(&dto); err != nil {
 		slog.Error("Error al decodificar body en Update", "error", err)
 		http.Error(w, `{"error":"JSON invalido o vacio"}`, http.StatusBadRequest)
 		return
 	}
 
+	//Parseo y guardado de Imagen
+	file, handle, err := r.FormFile("imagen")
+	if err == nil {
+		dto.ImageURL, err = utils.GuardarImagen(file, handle, "discos")
+		if err != nil {
+			slog.Error("Error al guardar imagen del request en Create", "error", err)
+			http.Error(w, `{"error":"No se pudo crear el disco"}`, http.StatusInternalServerError)
+			return
+		}
+	}
+
 	dto.ID = id
 
+	//TODO: Implementar borrado de imagen antigua
 	ds := &model.Disco{
 		ID:         dto.ID,
 		Nombre:     dto.Nombre,
@@ -175,6 +212,7 @@ func (d *Discos) Update(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	updated.ImageURL = utils.CompletarImageURL(r.Host, updated.ImageURL)
 
 	if err := json.NewEncoder(w).Encode(updated.ToDto()); err != nil {
 		slog.Error("Error al codificar disco actualizado", "error", err)
@@ -205,6 +243,7 @@ func (d *Discos) Delete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"Disco no encontrado"}`, http.StatusNotFound)
 		return
 	}
+	//TODO: Implementar eliminacion de imagen
 
 	w.WriteHeader(http.StatusNoContent)
 }

@@ -7,7 +7,7 @@ type DTO struct {
 	FormFactor       string `json:"form_factor"`
 	SocketProcesador string `json:"socket_procesador"`
 	SocketRam        string `json:"socket_ram"`
-	MSRP             string `json:"msrp"`
+	MSRP             int    `json:"msrp"`
 	ImageURL         string `json:"image_url"`
 	Orden            int    `json:"orden"`
 	Habilitado       bool   `json:"habilitado"`
@@ -20,7 +20,7 @@ type Motherboard struct {
 	FormFactor       string `gorm:"type:varchar(10);not null"`
 	SocketProcesador string `gorm:"type:varchar(10);not null"`
 	SocketRam        string `gorm:"type:varchar(10);not null"`
-	MSRP             string `gorm:"default:0"`
+	MSRP             int    `gorm:"default:0"`
 	ImageURL         string `gorm:"type:text"`
 	Orden            int    `gorm:"default:0"`
 	Habilitado       bool   `gorm:"type:bool;default:false"`

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"quepc/api/internal/componentes/rams/model"
+	"quepc/api/utils"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -44,6 +45,10 @@ func (ram *RAMs) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	for _, rss := range rs {
+		rss.ImageURL = utils.CompletarImageURL(r.Host, rss.ImageURL)
+	}
+
 	if err := json.NewEncoder(w).Encode(rs.ToDto()); err != nil {
 		slog.Error("Error al codificar rams a JSON", "error", err)
 		http.Error(w, `{"error":"Error interno al generar la respuesta"}`, http.StatusInternalServerError)
@@ -53,8 +58,9 @@ func (ram *RAMs) List(w http.ResponseWriter, r *http.Request) {
 
 func (ram *RAMs) Create(w http.ResponseWriter, r *http.Request) {
 	var dto model.DTO
+	r.ParseMultipartForm(10 << 20)
 
-	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+	if err := json.NewDecoder(strings.NewReader(r.FormValue("data"))).Decode(&dto); err != nil {
 		slog.Error("Error al decodificar body en Create", "error", err)
 		http.Error(w, `{"error":"JSON invalido o vacio"}`, http.StatusBadRequest)
 		return
@@ -67,6 +73,20 @@ func (ram *RAMs) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Parseo y guardado de Imagen
+	file, handle, err := r.FormFile("imagen")
+	if err != nil {
+		slog.Error("Error al leer imagen del request en Create", "error", err)
+		http.Error(w, `{"error":"Campo 'imagen' invalido o vacio"}`, http.StatusBadRequest)
+		return
+	}
+	dto.ImageURL, err = utils.GuardarImagen(file, handle, "rams")
+	if err != nil {
+		slog.Error("Error al guardar imagen del request en Create", "error", err)
+		http.Error(w, `{"error":"No se pudo crear el disco"}`, http.StatusInternalServerError)
+		return
+	}
+
 	rs := dto.ToModel()
 
 	created, err := ram.store.Create(rs)
@@ -75,6 +95,8 @@ func (ram *RAMs) Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"No se pudo crear la ram"}`, http.StatusInternalServerError)
 		return
 	}
+
+	created.ImageURL = utils.CompletarImageURL(r.Host, created.ImageURL)
 
 	w.WriteHeader(http.StatusCreated)
 
@@ -106,6 +128,8 @@ func (ram *RAMs) Read(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	rs.ImageURL = utils.CompletarImageURL(r.Host, rs.ImageURL)
+
 	if err := json.NewEncoder(w).Encode(rs.ToDto()); err != nil {
 		slog.Error("Error al codificar la ram leido", "error", err)
 		http.Error(w, `{"error":"Error interno al generar la respuesta"}`, http.StatusInternalServerError)
@@ -119,12 +143,24 @@ func (ram *RAMs) Update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"ID invalido"}`, http.StatusBadRequest)
 		return
 	}
+	r.ParseMultipartForm(10 << 20)
 
 	var dto model.DTO
-	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+	if err := json.NewDecoder(strings.NewReader(r.FormValue("data"))).Decode(&dto); err != nil {
 		slog.Error("Error al decodificar body en Update", "error", err)
 		http.Error(w, `{"error":"JSON invalido o vacio"}`, http.StatusBadRequest)
 		return
+	}
+
+	//Parseo y guardado de Imagen
+	file, handle, err := r.FormFile("imagen")
+	if err == nil {
+		dto.ImageURL, err = utils.GuardarImagen(file, handle, "rams")
+		if err != nil {
+			slog.Error("Error al guardar imagen del request en Create", "error", err)
+			http.Error(w, `{"error":"No se pudo crear el disco"}`, http.StatusInternalServerError)
+			return
+		}
 	}
 
 	dto.ID = id
@@ -156,6 +192,8 @@ func (ram *RAMs) Update(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	updated.ImageURL = utils.CompletarImageURL(r.Host, updated.ImageURL)
 
 	if err := json.NewEncoder(w).Encode(updated.ToDto()); err != nil {
 		slog.Error("Error al codificar ram actualizada", "error", err)
