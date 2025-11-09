@@ -46,7 +46,9 @@ func (ram *RAMs) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, rss := range rs {
-		rss.ImageURL = utils.CompletarImageURL(r.Host, rss.ImageURL)
+		if strings.TrimSpace(rss.ImageURL) != "" {
+			rss.ImageURL = utils.CompletarImageURL(r.Host, rss.ImageURL)
+		}
 	}
 
 	if err := json.NewEncoder(w).Encode(rs.ToDto()); err != nil {

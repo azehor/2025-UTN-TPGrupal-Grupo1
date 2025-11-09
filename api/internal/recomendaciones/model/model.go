@@ -1,19 +1,19 @@
 package model
 
 type DTO struct {
-	ID       string `json:"id"`
-	Nombre   string `json:"nombre"`
-	Tipo     string `json:"tipo"`
-	Precio   int    `json:"precio"`
-	ImageURL string `json:"image_url"`
-	Orden    int    `json:"orden"`
+	ID       string  `json:"id"`
+	Nombre   string  `json:"nombre"`
+	Tipo     string  `json:"tipo"`
+	Precio   float64 `json:"precio"`
+	ImageURL string  `json:"image_url"`
+	Orden    int     `json:"orden"`
 }
 
 type Componente struct {
 	ID       string
 	Nombre   string
 	Tipo     string
-	Precio   int
+	Precio   float64
 	ImageURL string
 	Orden    int
 }

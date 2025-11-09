@@ -4,6 +4,7 @@
 !.env.development.secrets.example
 !.env.production.example
 !.env.production.secrets.example
+!secrets/.gitkeep
 
 # Node and Vite artifacts
 frontend/node_modules/
@@ -33,4 +34,15 @@ db_data/
 api/tmp
 api/bin
 api/.air
+# Ignorar estáticos subidos en runtime (mantener README)
 api/static/
+!api/static/README.md
+!api/static/images/
+api/static/images/**
+!api/static/images/.gitkeep
+
+db_data/
+!db_data/.gitkeep
+db_data_dev/
+!db_data_dev/.gitkeep
+

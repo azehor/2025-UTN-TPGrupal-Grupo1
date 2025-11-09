@@ -112,10 +112,20 @@ class ApiService {
     return response.json();
   }
 
-  // Listar items de una entidad
-  async list(entityType: EntityType): Promise<GenericItem[]> {
+  // Listar items de una entidad con soporte de query params
+  async list(entityType: EntityType, params?: Record<string, string | number | boolean | undefined>): Promise<GenericItem[]> {
     const endpoint = ENTITY_ENDPOINTS[entityType];
-    return this.request<GenericItem[]>(endpoint);
+    let fullEndpoint = endpoint;
+    if (params) {
+      const search = new URLSearchParams();
+      Object.entries(params).forEach(([k, v]) => {
+        if (v === undefined || v === null) return;
+        search.append(k, String(v));
+      });
+      const qs = search.toString();
+      if (qs.length) fullEndpoint += `?${qs}`;
+    }
+    return this.request<GenericItem[]>(fullEndpoint);
   }
 
   // Obtener un item específico
@@ -125,7 +135,7 @@ class ApiService {
   }
 
   // Crear un nuevo item
-  async create(entityType: EntityType, data: Partial<GenericItem>, imageFile?: File): Promise<GenericItem> {
+  async create(entityType: EntityType, data: Partial<GenericItem>, _imageFile?: File): Promise<GenericItem> {
     const endpoint = ENTITY_ENDPOINTS[entityType];
     
     // Remover el ID y la imagen URL para creación
@@ -139,7 +149,7 @@ class ApiService {
   }
 
   // Actualizar un item existente
-  async update(entityType: EntityType, id: string, data: Partial<GenericItem>, imageFile?: File): Promise<GenericItem> {
+  async update(entityType: EntityType, id: string, data: Partial<GenericItem>, _imageFile?: File): Promise<GenericItem> {
     const endpoint = ENTITY_ENDPOINTS[entityType];
     
     // Remover el ID y la imagen URL del body
