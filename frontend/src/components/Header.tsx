@@ -43,12 +43,14 @@ export const Header: FC = () => {
             Por Software
           </NavLink>
         </div>
-        
+        <div className="flex items-center w-8"></div>
+        {/*
         <div className="flex items-center">
           <button className="p-2 rounded-full text-gray-400 hover:bg-gray-800 transition-colors">
             <span className="material-symbols-outlined text-lg">light_mode</span>
           </button>
         </div>
+        */}
       </nav>
     </header>
   );
