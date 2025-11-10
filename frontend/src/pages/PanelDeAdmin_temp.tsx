@@ -8,7 +8,8 @@ const emptyTemplate = (tipo: EntityType): GenericItem => {
 	const base: GenericItem = { id: "", nombre: "" };
 	switch (tipo) {
 		case "software":
-			return { ...base, tipo: "", empresa: "", image_url: "", orden_grafica: 0, orden_procesador: 0, orden_ram: 0, carrera: "" };
+			// Tipo por defecto: 'normal'
+			return { ...base, tipo: "normal", empresa: "", image_url: "", orden_grafica: 0, orden_procesador: 0, orden_ram: 0, carrera: "" };
 		case "gabinete":
 			return { ...base, fabricante: "", form_factor: "", image_url: "", max_largo_gpu_float: 0, msrp: "", socket: "" };
 		case "procesador":
@@ -187,6 +188,15 @@ const PanelDeAdmin: FC = () => {
 		e.preventDefault();
 		if (!form.nombre?.trim()) return;
 
+		// Validación: si es software, tipo solo puede ser 'normal' o 'juego'
+		if (selectedType === 'software') {
+			const tipoVal = (form.tipo || '').toString();
+			if (tipoVal !== 'normal' && tipoVal !== 'juego') {
+				setError('El tipo para software debe ser "normal" o "juego"');
+				return;
+			}
+		}
+
 		setLoading(true);
 		setError(null);
 		
@@ -355,7 +365,14 @@ const PanelDeAdmin: FC = () => {
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div>
 								<label className={labelClass}>Tipo</label>
-								<input value={form.tipo || ''} onChange={(e) => handleChange('tipo', e.target.value)} className={inputClass} />
+								<select
+									value={form.tipo || 'normal'}
+									onChange={(e) => handleChange('tipo', e.target.value)}
+									className={inputClass}
+								>
+									<option value="normal">Normal</option>
+									<option value="juego">Juego</option>
+								</select>
 							</div>
 							<div>
 								<label className={labelClass}>Empresa</label>

@@ -24,7 +24,7 @@ const emptyTemplate = (tipo: EntityType): GenericItem => {
 		case "memoriaRam":
 			return { ...base, capacidad: 0, fabricante: "", generacion: "", image_url: "" };
 		case "carrera":
-			return { ...base };
+ 			return { ...base, image_url: "" };
 	}
 };
 
@@ -237,6 +237,7 @@ const PanelDeAdmin: FC = () => {
 			await apiService.delete(selectedType, id);
 			setItems((prev) => prev.filter((x) => x.id !== id));
 			// Actualizar estadísticas después de eliminar un item
+			await loadItems();
 			setStatsData(prev => ({
 				...prev,
 				[selectedType]: Math.max(0, (prev[selectedType] || 0) - 1)
@@ -359,7 +360,14 @@ const PanelDeAdmin: FC = () => {
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div>
 								<label className={labelClass}>Tipo</label>
-								<input value={form.tipo || ''} onChange={(e) => handleChange('tipo', e.target.value)} className={inputClass} />
+								<select
+									value={form.tipo || 'normal'}
+									onChange={(e) => handleChange('tipo', e.target.value)}
+									className={inputClass}
+								>
+									<option value="normal">Normal</option>
+									<option value="juego">Juego</option>
+								</select>
 							</div>
 							<div>
 								<label className={labelClass}>Empresa</label>
@@ -506,7 +514,101 @@ const PanelDeAdmin: FC = () => {
 					</div>
 				);
 			case 'carrera':
-				return <p className="text-gray-600 dark:text-gray-400">Solo es necesario completar el nombre para las carreras.</p>;
+				 return (
+					<div className="space-y-4">
+					<div>
+						<label className={labelClass}>Image URL (opcional)</label>
+						<input
+						value={form.image_url || ''}
+						onChange={(e) => {
+							handleChange('image_url', e.target.value);
+							// si escriben una URL manual, usarla como preview
+							setImagePreview(e.target.value || null);
+							setSelectedImage(null);
+						}}
+						className={inputClass}
+						placeholder="https://ejemplo.com/imagen.jpg"
+						/>
+					</div>
+
+					<div>
+						<label className={labelClass}>Subir imagen (opcional)</label>
+						<div className="space-y-3">
+						<div
+							className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+							dragActive
+								? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+								: 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+							}`}
+							onDrop={handleImageDrop}
+							onDragOver={handleImageDragOver}
+							onDragLeave={handleImageDragLeave}
+						>
+							{imagePreview ? (
+							<div className="space-y-3">
+								<img
+								src={imagePreview}
+								alt="Preview"
+								className="mx-auto max-h-32 rounded-lg object-contain"
+								/>
+								<div className="flex justify-center gap-2">
+								<label className="cursor-pointer px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors">
+									Cambiar imagen
+									<input
+									type="file"
+									accept="image/jpeg,image/jpg"
+									onChange={(e) => e.target.files?.[0] && handleImageSelect(e.target.files[0])}
+									className="hidden"
+									/>
+								</label>
+								<button
+									type="button"
+									onClick={() => {
+									removeImage();
+									// si borran el archivo/preview, mantener la URL si existe, o nada
+									if (!form.image_url) setImagePreview(null);
+									}}
+									className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-colors"
+								>
+									Eliminar
+								</button>
+								</div>
+							</div>
+							) : (
+							<div className="space-y-3">
+								<div className="mx-auto w-12 h-12 text-gray-400">
+								<span className="material-symbols-outlined text-4xl">cloud_upload</span>
+								</div>
+								<div>
+								<p className="text-gray-600 dark:text-gray-400 mb-2">
+									Arrastra una imagen aquí o
+								</p>
+								<label className="cursor-pointer px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors inline-block">
+									Seleccionar archivo
+									<input
+									type="file"
+									accept="image/jpeg,image/jpg"
+									onChange={(e) => e.target.files?.[0] && handleImageSelect(e.target.files[0])}
+									className="hidden"
+									/>
+								</label>
+								</div>
+								<p className="text-xs text-gray-500 dark:text-gray-400">
+								JPG (máx. 10MB)
+								</p>
+							</div>
+							)}
+						</div>
+
+						{selectedImage && (
+							<div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded p-2">
+							<strong>Archivo seleccionado:</strong> {selectedImage.name} ({(selectedImage.size / 1024 / 1024).toFixed(2)} MB)
+							</div>
+						)}
+						</div>
+					</div>
+					</div>
+				);
 			default:
 				return (
 					<div className="space-y-4">
@@ -884,7 +986,14 @@ const PanelDeAdmin: FC = () => {
 								</div>
 								<button 
 									className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-									onClick={() => setViewMode('form')}
+									onClick={() => {
+										setEditingId(null);
+										setForm(emptyTemplate(selectedType));
+										setSelectedImage(null);
+										setImagePreview(null);
+										setError(null);
+										setViewMode('form');
+									}}
 								>
 									<span className="material-symbols-outlined">add</span>
 									Agregar nuevo

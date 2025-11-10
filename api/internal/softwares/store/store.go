@@ -67,7 +67,19 @@ func (s *Store) Update(software *model.Software) (int64, error) {
 	if !utils.ValidarUUID(software.ID) {
 		return 0, fmt.Errorf("id invalido")
 	}
-	res := s.db.Model(&model.Software{}).Where("id = ?", software.ID).Updates(software)
+
+	// usar map para incluir ceros y strings vacíos
+	values := map[string]interface{}{
+		"tipo":             software.Tipo,
+		"nombre":           software.Nombre,
+		"empresa":          software.Empresa,
+		"image_url":        software.ImageURL,
+		"orden_grafica":    software.OrdenGrafica,
+		"orden_procesador": software.OrdenProcesador,
+		"orden_ram":        software.OrdenRam,
+	}
+
+	res := s.db.Model(&model.Software{}).Where("id = ?", software.ID).Updates(values)
 	return res.RowsAffected, res.Error
 }
 
