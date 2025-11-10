@@ -120,9 +120,34 @@ class ApiService {
       throw new Error(`API Error ${response.status}: ${errorText}`);
     }
     
-    return response.json();
-  }
+    // Si no hay contenido devolver undefined para permitir métodos que esperan void
+    if (response.status === 204) {
+      return undefined as unknown as T;
+    }
 
+    // Determinar tipo de contenido
+    const contentType = response.headers.get('content-type') || '';
+
+    // Si es JSON, parsear normalmente
+    if (contentType.includes('application/json')) {
+      return response.json();
+    }
+
+    // Si no es JSON, intentar leer como texto. Si está vacío devolver undefined.
+    const text = await response.text();
+    if (!text) {
+      return undefined as unknown as T;
+    }
+
+    // Intentar parsear JSON por si el servidor devolvió JSON sin content-type correcto.
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      // Devolver texto crudo si no es JSON
+      return text as unknown as T;
+    }
+  }
+  
   // Listar items de una entidad con soporte de query params
   async list(entityType: EntityType, params?: Record<string, string | number | boolean | undefined>): Promise<GenericItem[]> {
     const endpoint = ENTITY_ENDPOINTS[entityType];
