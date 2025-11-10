@@ -2,6 +2,10 @@
 
 - **frontend** → React + Vite  
 - **api** → Go
+- **Base de datos** → Postgresql
+
+
+![Arquitectura del sistema](./Arquitectura.jpg)
 
 ## Crear archivo .env en /api
 ```bash
