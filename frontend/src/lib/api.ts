@@ -81,26 +81,37 @@ class ApiService {
   ): Promise<T> {
     const url = `${API_BASE_URL}/${endpoint}`;
     
-    const headers = new Headers(options.headers || {})
-    headers.set('Content-Type', 'application/json')
-    const token = getToken()
-    if (token) headers.set('Authorization', `Bearer ${token}`)
+    
+    console.log(options.body);
 
-    const config: RequestInit = {
-      ...options,
-      headers,
-      // We use Bearer tokens, not cookies; avoid forcing credentials to prevent CORS rejections
-      // (server currently has AllowCredentials=false). Let callers opt-in if needed.
-      credentials: options.credentials,
-    };
+  // Crear headers base
+  const headers = new Headers();
+  
+  // Agregar token si existe
+  const token = getToken();
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
 
-    // Solo agregar Content-Type si no es FormData
-    if (!(options.body instanceof FormData)) {
-      config.headers = {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      };
-    }
+  
+  // Agregar Content-Type si no es FormData
+  if (!(options.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  // Combinar con headers personalizados
+  if (options.headers) {
+    Object.entries(options.headers).forEach(([key, value]) => {
+      headers.set(key, value);
+    });
+  }
+
+  
+  const config: RequestInit = {
+    ...options,
+    headers,
+    credentials: options.credentials,
+  };
 
     const response = await fetch(url, config);
     
@@ -135,30 +146,50 @@ class ApiService {
   }
 
   // Crear un nuevo item
-  async create(entityType: EntityType, data: Partial<GenericItem>, _imageFile?: File): Promise<GenericItem> {
+  async create(entityType: EntityType, data: Partial<GenericItem>, imageFile?: File): Promise<GenericItem> {
     const endpoint = ENTITY_ENDPOINTS[entityType];
+    
+      // Crear FormData
+    const formData = new FormData();
     
     // Remover el ID y la imagen URL para creación
     const { id, image_url, ...createData } = data;
     
-    // TEMPORALMENTE: Solo enviar JSON, ignorar imágenes hasta implementar backend
+    // Agregar los datos como campo JSON
+    formData.append('data', JSON.stringify(createData));
+    
+    // Agregar imagen si existe
+    if (imageFile) {
+      formData.append('imagen', imageFile);
+    }
+
     return this.request<GenericItem>(endpoint, {
       method: 'POST',
-      body: JSON.stringify(createData),
+      body: formData
     });
   }
 
   // Actualizar un item existente
-  async update(entityType: EntityType, id: string, data: Partial<GenericItem>, _imageFile?: File): Promise<GenericItem> {
+  async update(entityType: EntityType, id: string, data: Partial<GenericItem>, imageFile?: File): Promise<GenericItem> {
     const endpoint = ENTITY_ENDPOINTS[entityType];
+    
+    // Crear FormData
+    const formData = new FormData();
     
     // Remover el ID y la imagen URL del body
     const { id: _, image_url, ...updateData } = data;
     
-    // TEMPORALMENTE: Solo enviar JSON, ignorar imágenes hasta implementar backend
+    // Agregar los datos como campo JSON
+    formData.append('data', JSON.stringify(updateData));
+    
+    // Agregar imagen si existe
+    if (imageFile) {
+      formData.append('imagen', imageFile);
+    }
+
     return this.request<GenericItem>(`${endpoint}/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(updateData),
+      body: formData
     });
   }
 
