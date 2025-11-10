@@ -11,6 +11,7 @@ type DTO struct {
 	MSRP       int    `json:"msrp"`
 	ImageURL   string `json:"image_url"`
 	Orden      int    `json:"orden"`
+	Socket     string `json:"socket"`
 	Habilitado bool   `json:"habilitado"`
 }
 
@@ -25,6 +26,7 @@ type Procesador struct {
 	MSRP       int    `gorm:"default:0"`
 	ImageURL   string `gorm:"type:text"`
 	Orden      int    `gorm:"default:0"`
+	Socket     string `gorm:"type:varchar(20)"`
 	Habilitado bool   `gorm:"type:bool;default:false"`
 }
 
@@ -42,6 +44,7 @@ func (p *Procesador) ToDto() *DTO {
 		MSRP:       p.MSRP,
 		ImageURL:   p.ImageURL,
 		Orden:      p.Orden,
+		Socket:     p.Socket,
 		Habilitado: p.Habilitado,
 	}
 }
@@ -67,6 +70,7 @@ func (dto *DTO) ToModel() *Procesador {
 		MSRP:       dto.MSRP,
 		ImageURL:   dto.ImageURL,
 		Orden:      dto.Orden,
+		Socket:     dto.Socket,
 		Habilitado: dto.Habilitado,
 	}
 }

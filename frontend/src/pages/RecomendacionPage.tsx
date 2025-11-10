@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useBusqueda } from "../context/BusquedaContext";
 import { useNavigate } from "react-router-dom";
 import getApiBase from "../lib/env";
@@ -37,25 +37,44 @@ export const RecomendacionPage = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  const [minBudgetStr, setMinBudgetStr] = useState<string>("");
+  const [maxBudgetStr, setMaxBudgetStr] = useState<string>("");
+
+   // Gasto total (suma de item.precio)
+ const precioTotal = useMemo(() => {
+    return items.reduce((acc, it) => acc + (it.precio ?? 0), 0);
+  }, [items]);
+
+  const formatCurrency = (v: number) => `$${v.toFixed(2)}`;
+
   useEffect(() => {
     if (!tipo || !datos) {
       navigate("/busqueda-carrera");
       return;
     }
 
-    const fetchItems = async () => {
+     const fetchItems = async (minBudget?: number, maxBudget?: number) => {
       setLoading(true);
+      setError(null);
       try {
         let res: Response;
         const API_BASE = getApiBase();
 
         if (tipo === "carrera") {
-          res = await fetch(`${API_BASE}/recomendaciones-carrera/${datos.id}`);
+          const params = new URLSearchParams();
+          if (minBudget !== undefined) params.append("minBudget", String(minBudget));
+          if (maxBudget !== undefined) params.append("maxBudget", String(maxBudget));
+          const qs = params.toString();
+          const url = qs ? `${API_BASE}/recomendaciones-carrera/${datos.id}?${qs}` : `${API_BASE}/recomendaciones-carrera/${datos.id}`;
+          res = await fetch(url);
         } else if (tipo === "software") {
+          const payload: Record<string, any> = { ids: datos.ids as string[] };
+          if (minBudget !== undefined) payload.minBudget = minBudget;
+          if (maxBudget !== undefined) payload.maxBudget = maxBudget;
           res = await fetch(`${API_BASE}/recomendaciones-softwares`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ids: datos.ids as string[] }),
+            body: JSON.stringify(payload),
           });
         } else {
           throw new Error("Tipo de búsqueda no soportado");
@@ -74,6 +93,56 @@ export const RecomendacionPage = () => {
     fetchItems();
   }, [tipo, datos, navigate]);
 
+
+   const parseBudget = (s: string): number | undefined => {
+    const v = s.trim();
+    if (!v) return undefined;
+    const n = Number(v); 
+    return Number.isFinite(n) ? n : undefined;
+  };
+
+  const applyBudgetFilter = async () => {
+    setError(null);
+    setItems([]);
+    const min = parseBudget(minBudgetStr);
+    const max = parseBudget(maxBudgetStr);
+
+    setLoading(true);
+    try {
+      let res: Response;
+      const API_BASE = getApiBase();
+
+      if (tipo === "carrera") {
+        const params = new URLSearchParams();
+        if (min !== undefined) params.append("minBudget", String(min));
+        if (max !== undefined) params.append("maxBudget", String(max));
+        const qs = params.toString();
+        const url = qs ? `${API_BASE}/recomendaciones-carrera/${datos.id}?${qs}` : `${API_BASE}/recomendaciones-carrera/${datos.id}`;
+        res = await fetch(url);
+      } else if (tipo === "software") {
+        const payload: Record<string, any> = { ids: datos.ids as string[] };
+        if (min !== undefined) payload.minBudget = min;
+        if (max !== undefined) payload.maxBudget = max;
+        res = await fetch(`${API_BASE}/recomendaciones-softwares`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        throw new Error("Tipo de búsqueda no soportado");
+      }
+
+      if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+      const data: GenericItem[] = await res.json();
+      setItems(data);
+    } catch (err: any) {
+      setError(err.message || "Error al obtener recomendaciones");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🔹 Íconos reemplazados por emojis
   const iconMap: Record<string, string> = {
     Procesador: "🧠",
     GPU: "🎮",
@@ -93,8 +162,41 @@ export const RecomendacionPage = () => {
             Tu configuración de PC recomendada
           </h2>
           <p className="mt-4 text-lg text-gray-400">
-            Esta es la configuración óptima de PC según tus necesidades.
+            Esta es la configuración óptima de PC según tus necesidades.del PC para sus necesidades.
           </p>
+        </div>
+
+        {/* Filtro por presupuesto */}
+        <div className="max-w-md mx-auto mb-6 bg-[#0b1220] p-4 rounded-lg border border-gray-700">
+          <h4 className="text-sm text-gray-300 mb-2">Filtrar por presupuesto (opcional)</h4>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="Min (USD)"
+              value={minBudgetStr}
+              onChange={(e) => setMinBudgetStr(e.target.value)}
+              className="w-1/2 px-3 py-2 bg-[#111827] border border-gray-600 rounded text-white"
+            />
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="Max (USD)"
+              value={maxBudgetStr}
+              onChange={(e) => setMaxBudgetStr(e.target.value)}
+              className="w-1/2 px-3 py-2 bg-[#111827] border border-gray-600 rounded text-white"
+            />
+          </div>
+          <div className="mt-3 flex justify-center">
+            <button
+              onClick={applyBudgetFilter}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Actualizar recomendaciones
+            </button>
+          </div>
         </div>
 
         {/* Tarjeta principal */}
@@ -135,6 +237,12 @@ export const RecomendacionPage = () => {
               </p>
             )}
           </div>
+
+        {/* Gasto total */}
+         <div className="flex items-center justify-end text-white font-semibold mt-4">
+           <span className="text-sm text-gray-300 mr-3">Gasto total:</span>
+         <span className="text-xl">{formatCurrency(precioTotal)}</span>
+        </div>
 
           {/* Botones inferiores */}
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-8 border-t border-gray-700">

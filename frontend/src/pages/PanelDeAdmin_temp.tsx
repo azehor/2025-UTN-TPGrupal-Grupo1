@@ -443,15 +443,15 @@ const PanelDeAdmin: FC = () => {
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 							<div>
 								<label className={labelClass}>Orden gráfica</label>
-								<input type="number" value={form.orden_grafica || 0} onChange={(e) => handleChange('orden_grafica', Number(e.target.value))} className={inputClass} />
+								<input type="number" value={form.orden_grafica ?? 0} onChange={(e) => handleChange('orden_grafica', Number(e.target.value))} className={inputClass} />
 							</div>
 							<div>
 								<label className={labelClass}>Orden procesador</label>
-								<input type="number" value={form.orden_procesador || 0} onChange={(e) => handleChange('orden_procesador', Number(e.target.value))} className={inputClass} />
+								<input type="number" value={form.orden_procesador ?? 0} onChange={(e) => handleChange('orden_procesador', Number(e.target.value))} className={inputClass} />
 							</div>
 							<div>
 								<label className={labelClass}>Orden RAM</label>
-								<input type="number" value={form.orden_ram || 0} onChange={(e) => handleChange('orden_ram', Number(e.target.value))} className={inputClass} />
+								<input type="number" value={form.orden_ram ?? 0} onChange={(e) => handleChange('orden_ram', Number(e.target.value))} className={inputClass} />
 							</div>
 						</div>
 						<div>

@@ -71,7 +71,8 @@ export const BusquedaSoftware: React.FC = () => {
       setHighlight(h => Math.max(h - 1, 0));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      const pick = filtered[highlight] ?? softwares.find(s => s.nombre.toLowerCase() === q.trim().toLowerCase());
+      const currentVal = (e.currentTarget as HTMLInputElement).value.trim().toLowerCase();
+      const pick = filtered[highlight] ?? softwares.find(s => s.nombre.toLowerCase() === currentVal);
       if (pick) addToStack(pick);
     } else if (e.key === "Escape") {
       setFiltered([]);
