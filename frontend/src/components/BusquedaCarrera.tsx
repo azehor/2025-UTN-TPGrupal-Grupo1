@@ -91,7 +91,7 @@ export const BusquedaCarrera: React.FC = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 gap-6">
           {filteredList.length > 0 ? (
             filteredList.map((carrera) => (
               <div
@@ -106,10 +106,10 @@ export const BusquedaCarrera: React.FC = () => {
                   <img
                     src={carrera.imageURL}
                     alt={carrera.nombre}
-                    className="w-full h-32 object-cover rounded-lg mb-4"
+                    className="w-full h-100 object-cover rounded-lg mb-4"
                   />
                 ) : (
-                  <div className="w-full h-32 bg-gray-700 rounded-lg mb-4 flex items-center justify-center">
+                  <div className="w-full h-100 bg-gray-700 rounded-lg mb-4 flex items-center justify-center">
                     <span className="text-gray-500 text-sm">Sin imagen</span>
                   </div>
                 )}
