@@ -1,10 +1,11 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import './index.css'
-// import './styles/theme.css'
-import App from './App.tsx'
-import { BusquedaProvider } from "./context/BusquedaContext"
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import './index.css';
+import './App.css'; 
+import App from './App';
+import { BusquedaProvider } from './context/BusquedaContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 async function loadRuntimeConfig() {
   try {
@@ -12,20 +13,23 @@ async function loadRuntimeConfig() {
     if (!res.ok) return;
     const cfg = await res.json();
     (window as any).__ENV = cfg;
-  } catch (e) {
+  } catch {
     // no runtime config available
   }
 }
 
 (async () => {
   await loadRuntimeConfig();
+
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <BusquedaProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </BusquedaProvider>
-    </StrictMode>,
-  )
-})()
+      <ThemeProvider>
+        <BusquedaProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </BusquedaProvider>
+      </ThemeProvider>
+    </StrictMode>
+  );
+})();
