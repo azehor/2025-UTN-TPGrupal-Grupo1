@@ -1,23 +1,23 @@
-/* 🎨 Estilos generales */
+/* Estilos generales */
 body {
   margin: 0;
   padding: 0;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* 🌞 Modo claro */
+/* Modo claro */
 body.light {
   background-color: #f7f7f7;
   color: #222;
 }
 
-/* 🌚 Modo oscuro */
+/* Modo oscuro */
 body.dark {
   background-color: #101c22;
   color: #f5f5f5;
 }
 
-/* 🧱 Contenedores base */
+/* Contenedores base */
 .app-container {
   min-height: 100vh;
   display: flex;
@@ -29,7 +29,7 @@ body.dark {
   padding: 1rem;
 }
 
-/* 🌗 Botón de cambio */
+/* Botón de cambio */
 .theme-toggle {
   display: flex;
   justify-content: center;
