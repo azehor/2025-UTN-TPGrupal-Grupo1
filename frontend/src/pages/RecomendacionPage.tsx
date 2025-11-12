@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useBusqueda } from "../context/BusquedaContext";
 import { useNavigate } from "react-router-dom";
 import getApiBase from "../lib/env";
+import { Range } from "react-range";
 
 export interface GenericItem {
   id: string;
@@ -40,8 +41,8 @@ export const RecomendacionPage = () => {
   const [minBudgetStr, setMinBudgetStr] = useState<string>("");
   const [maxBudgetStr, setMaxBudgetStr] = useState<string>("");
 
-   // Gasto total (suma de item.precio)
- const precioTotal = useMemo(() => {
+  // Gasto total (suma de item.precio)
+  const precioTotal = useMemo(() => {
     return items.reduce((acc, it) => acc + (it.precio ?? 0), 0);
   }, [items]);
 
@@ -53,7 +54,7 @@ export const RecomendacionPage = () => {
       return;
     }
 
-     const fetchItems = async (minBudget?: number, maxBudget?: number) => {
+    const fetchItems = async (minBudget?: number, maxBudget?: number) => {
       setLoading(true);
       setError(null);
       try {
@@ -65,7 +66,9 @@ export const RecomendacionPage = () => {
           if (minBudget !== undefined) params.append("minBudget", String(minBudget));
           if (maxBudget !== undefined) params.append("maxBudget", String(maxBudget));
           const qs = params.toString();
-          const url = qs ? `${API_BASE}/recomendaciones-carrera/${datos.id}?${qs}` : `${API_BASE}/recomendaciones-carrera/${datos.id}`;
+          const url = qs
+            ? `${API_BASE}/recomendaciones-carrera/${datos.id}?${qs}`
+            : `${API_BASE}/recomendaciones-carrera/${datos.id}`;
           res = await fetch(url);
         } else if (tipo === "software") {
           const payload: Record<string, any> = { ids: datos.ids as string[] };
@@ -93,11 +96,10 @@ export const RecomendacionPage = () => {
     fetchItems();
   }, [tipo, datos, navigate]);
 
-
-   const parseBudget = (s: string): number | undefined => {
+  const parseBudget = (s: string): number | undefined => {
     const v = s.trim();
     if (!v) return undefined;
-    const n = Number(v); 
+    const n = Number(v);
     return Number.isFinite(n) ? n : undefined;
   };
 
@@ -117,7 +119,9 @@ export const RecomendacionPage = () => {
         if (min !== undefined) params.append("minBudget", String(min));
         if (max !== undefined) params.append("maxBudget", String(max));
         const qs = params.toString();
-        const url = qs ? `${API_BASE}/recomendaciones-carrera/${datos.id}?${qs}` : `${API_BASE}/recomendaciones-carrera/${datos.id}`;
+        const url = qs
+          ? `${API_BASE}/recomendaciones-carrera/${datos.id}?${qs}`
+          : `${API_BASE}/recomendaciones-carrera/${datos.id}`;
         res = await fetch(url);
       } else if (tipo === "software") {
         const payload: Record<string, any> = { ids: datos.ids as string[] };
@@ -142,7 +146,6 @@ export const RecomendacionPage = () => {
     }
   };
 
-  // 🔹 Íconos reemplazados por emojis
   const iconMap: Record<string, string> = {
     Procesador: "🧠",
     GPU: "🎮",
@@ -162,33 +165,65 @@ export const RecomendacionPage = () => {
             Tu configuración de PC recomendada
           </h2>
           <p className="mt-4 text-lg text-gray-400">
-            Esta es la configuración óptima de PC según tus necesidades.del PC para sus necesidades.
+            Esta es la configuración óptima de PC según tus necesidades.
           </p>
         </div>
 
-        {/* Filtro por presupuesto */}
-        <div className="max-w-md mx-auto mb-6 bg-[#0b1220] p-4 rounded-lg border border-gray-700">
-          <h4 className="text-sm text-gray-300 mb-2">Filtrar por presupuesto (opcional)</h4>
-          <div className="flex gap-2">
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="Min (USD)"
-              value={minBudgetStr}
-              onChange={(e) => setMinBudgetStr(e.target.value)}
-              className="w-1/2 px-3 py-2 bg-[#111827] border border-gray-600 rounded text-white"
-            />
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="Max (USD)"
-              value={maxBudgetStr}
-              onChange={(e) => setMaxBudgetStr(e.target.value)}
-              className="w-1/2 px-3 py-2 bg-[#111827] border border-gray-600 rounded text-white"
-            />
-          </div>
+        {/*Nuevo filtro con slider */}
+        <div className="max-w-md mx-auto mb-6 bg-[#101c22]/80 p-4 rounded-lg border border-gray-700">
+          <h4 className="text-sm text-gray-300 mb-2 text-center">
+            Filtrar por presupuesto (USD)
+          </h4>
+
+          <Range
+            step={10}
+            min={500}
+            max={10000}
+            values={[
+              parseFloat(minBudgetStr) || 500,
+              parseFloat(maxBudgetStr) || 10000,
+            ]}
+            onChange={(values) => {
+              setMinBudgetStr(values[0].toString());
+              setMaxBudgetStr(values[1].toString());
+            }}
+            renderTrack={({ props, children }) => {
+              const [minVal, maxVal] = [
+                parseFloat(minBudgetStr) || 500,
+                parseFloat(maxBudgetStr) || 10000,
+              ];
+              const min = 500;
+              const max = 10000;
+
+              return (
+                <div
+                  {...props}
+                  className="h-2 bg-gray-700 rounded-lg relative"
+                  style={props.style}
+                >
+                  <div
+                    className="absolute h-2 bg-blue-500 rounded-lg"
+                    style={{
+                      left: `${((minVal - min) / (max - min)) * 100}%`,
+                      right: `${100 - ((maxVal - min) / (max - min)) * 100}%`,
+                    }}
+                  />
+                  {children}
+                </div>
+              );
+            }}
+            renderThumb={({ props }) => (
+              <div
+                {...props}
+                className="w-5 h-5 bg-blue-500 rounded-full shadow-md cursor-pointer hover:scale-110 transition-transform"
+              />
+            )}
+          />
+
+          <p className="text-center text-gray-400 mt-3">
+            ${minBudgetStr || 500} — ${maxBudgetStr || 2000}
+          </p>
+
           <div className="mt-3 flex justify-center">
             <button
               onClick={applyBudgetFilter}
@@ -202,11 +237,12 @@ export const RecomendacionPage = () => {
         {/* Tarjeta principal */}
         <div className="bg-[#1a2831] rounded-2xl shadow-xl p-8 space-y-8">
           {loading && (
-            <p className="text-center text-gray-400">Cargando recomendaciones...</p>
+            <p className="text-center text-gray-400">
+              Cargando recomendaciones...
+            </p>
           )}
           {error && <p className="text-center text-red-500">{error}</p>}
 
-          {/* Lista de componentes */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {items.map((item) => (
               <div
@@ -226,7 +262,9 @@ export const RecomendacionPage = () => {
                   {item.empresa ? `Fabricante: ${item.empresa}` : "—"}
                 </p>
                 {item.precio && (
-                  <p className="text-sm text-gray-500 mt-1">Precio: ${item.precio}</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Precio: ${item.precio}
+                  </p>
                 )}
               </div>
             ))}
@@ -238,11 +276,11 @@ export const RecomendacionPage = () => {
             )}
           </div>
 
-        {/* Gasto total */}
-         <div className="flex items-center justify-end text-white font-semibold mt-4">
-           <span className="text-sm text-gray-300 mr-3">Gasto total:</span>
-         <span className="text-xl">{formatCurrency(precioTotal)}</span>
-        </div>
+          {/* Gasto total */}
+          <div className="flex items-center justify-end text-white font-semibold mt-4">
+            <span className="text-sm text-gray-300 mr-3">Gasto total:</span>
+            <span className="text-xl">{formatCurrency(precioTotal)}</span>
+          </div>
 
           {/* Botones inferiores */}
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-8 border-t border-gray-700">
